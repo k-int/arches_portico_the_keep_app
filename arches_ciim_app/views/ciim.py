@@ -16,6 +16,8 @@ from arches.app.models.models import Concept as modelConcept
 from arches.app.models.concept import Concept
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 
+from arches import __version__
+
 #Decorators
 def timer(func):
     '''
@@ -80,9 +82,7 @@ class ChangesView(View):
                     if not(len(resource.tiles) == 1 and not resource.tiles[0].data):
                         resource_json= {'modified':edit.timestamp.strftime('%d-%m-%YT%H:%M:%SZ')}
                         resource_json.update(JSONSerializer().serializeToPython(resource))
-                        if resource_json['displaydescription'] == '<Description>': resource_json['displaydescription'] = None
-                        if resource_json['map_popup'] == '<Name_Type>': resource_json['map_popup'] = None
-                        if resource_json['displayname'] == '<NMRW_Name>' : resource_json['displayname'] = None
+
                         data.append(resource_json)
                 else:
                     data.append({'modified':edit.timestamp,'resourceinstance_id':resourceid, 'tiles':None})
