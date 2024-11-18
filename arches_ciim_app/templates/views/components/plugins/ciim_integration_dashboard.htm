@@ -1,8 +1,104 @@
 {% load i18n %} 
 
+<style>
+    h1 {
+        font-size: 2em;
+        font-weight: bold;
+        margin: 6px 0 16px;
+    }
+    h2 {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 24px 0 16px;
+    }
+    .online {
+        color: green;
+        font-weight: bold;
+    }
 
-<div class="dashboard-container">
-    <div class="dashboard-summary">
-        <h1>Arches CIIM Integration Dashboard</h1>
+    #kint-logo {
+        width: 175px;
+    }
+
+    #ciim-logo {
+        width: 100px;
+    }
+
+    #arches-logo {
+        width: 300px;
+        height: 65%;
+        padding-left: 35px;
+    }
+    
+    .dashboard-page {
+        background-color: #fff;
+        color: #386ea4;
+        border: solid 0px red;
+        width: 100%;
+        height: 100%;
+        padding-left: 100px;
+        padding-top: 50px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .dashboard-container {
+        border: solid 0px green;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+    }
+    
+    .logos-row {
+        border: solid 0px blue;
+        padding-bottom: 25px;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+    }
+
+    .dashboard-header {
+        border: solid 0px blue;
+        width: 100%;
+    }
+
+    .dashboard-body {
+        border: solid 0px blue;
+        width: 100%;
+    }
+
+</style>
+
+<div class="dashboard-page">
+    
+    <div class="dashboard-container">
+        <div class = "dashboard-header">
+            <h1>Arches CIIM Integration Dashboard</h1>
+            <p>The Arches-CIIM application provides a regular extract of Arches data for inclusion within your CIIM database. 
+                This dashboard is being developed to provide users with some key information on how the API is functioning and may, in the future,
+                include functionality for changing settings on the Arches-CIIM app.</p>
+        </div>
+        
+        <div class="dashboard-body">
+            <h2>API status:</h2>
+            <p><span>Resources:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
+            <p><span>Tiles:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
+            <p><span>Resource changes:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
+            <p><span>Concepts:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
+            
+            <button class="btn btn-primary">Refresh</button>
+
+            <h2>Current mapping file:</h2>
+            <button class="btn btn-primary">Download</button>
+
+        </div>
+    </div>
+        
+    <div class = "logos-row">
+        <img src="../../../../media/img/k-int logo abbr (transparent).png" alt="K-int logo" id="kint-logo">
+        <img src="../../../../media/img/ciim-logo.png" alt="CIIM logo" id="ciim-logo">
+        <img src="../../../../media/img/arches_logo.png" alt="Arches logo" id="arches-logo">
     </div>
 </div>
