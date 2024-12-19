@@ -1,4 +1,4 @@
-{% load i18n %} 
+{% load i18n %}
 
 <style>
     h1 {
@@ -6,11 +6,13 @@
         font-weight: bold;
         margin: 6px 0 16px;
     }
+
     h2 {
         font-size: 1.5em;
         font-weight: bold;
         margin: 24px 0 16px;
     }
+
     .online {
         color: green;
         font-weight: bold;
@@ -29,7 +31,7 @@
         height: 65%;
         padding-left: 35px;
     }
-    
+
     .dashboard-page {
         background-color: #fff;
         color: #386ea4;
@@ -50,7 +52,7 @@
         flex-direction: column;
         justify-content: start;
     }
-    
+
     .logos-row {
         border: solid 0px blue;
         padding-bottom: 25px;
@@ -69,34 +71,68 @@
         width: 100%;
     }
 
+    .error-msg {
+        color: red;
+        font-weight: bold;
+        padding-bottom: 5px;
+    }
+
+    .input-label {
+        padding-bottom: 10px;
+        display: block;
+    }
+
+    .input-label-span {
+        border: solid 0px red;
+        min-width: 75px;
+        display: inline-block;
+    }
+
 </style>
 
 <div class="dashboard-page">
-    
+
     <div class="dashboard-container">
-        <div class = "dashboard-header">
+        <div class="dashboard-header">
             <h1>Arches CIIM Integration Dashboard</h1>
-            <p>The Arches-CIIM application provides a regular extract of Arches data for inclusion within your CIIM database. 
-                This dashboard is being developed to provide users with some key information on how the API is functioning and may, in the future,
+            <p>The Arches-CIIM application provides a regular extract of Arches data for inclusion within your CIIM
+                database.
+                This dashboard is being developed to provide users with some key information on how the API is
+                functioning and may, in the future,
                 include functionality for changing settings on the Arches-CIIM app.</p>
         </div>
-        
+
         <div class="dashboard-body">
             <h2>API status:</h2>
-            <p><span>Resources:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
-            <p><span>Tiles:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
-            <p><span>Resource changes:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
-            <p><span>Concepts:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class = "online"> Online</a></p>
-            
+            <p><span>Resources:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class="online">
+                    Online</a></p>
+            <p><span>Tiles:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class="online">
+                    Online</a></p>
+            <p><span>Resource changes:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard"
+                    class="online"> Online</a></p>
+            <p><span>Concepts:</span><a ref="http://127.0.0.1:8000/plugins/ciim_integration_dashboard" class="online">
+                    Online</a></p>
+
             <button class="btn btn-primary">Refresh</button>
 
-            <h2>Current mapping file:</h2>
-            <button class="btn btn-primary">Download</button>
+            <h2>Download latest changes:</h2>
+            <form data-bind="submit: onSubmit">
+                <label class="input-label">
+                    <span class = "input-label-span">Start date</span>
+                    <input type="date" data-bind="value: selectedStartDate" , id="dateFrom" name="dateFrom">
+                </label>
+                <label class="input-label">
+                    <span class = "input-label-span">End date</span>
+                    <input type="date" data-bind="value: selectedEndDate" id="dateTo" name="dateTo">
+                </label>
+                <p data-bind="text: errorMsg, visible: errorMsg" class = "error-msg"></p>
+                <button class="btn btn-primary" type="submit">Download</button>
+            </form>
 
         </div>
     </div>
-        
-    <div class = "logos-row">
+
+    <div class="logos-row">
         <img src="../../../../media/img/k-int logo abbr (transparent).png" alt="K-int logo" id="kint-logo">
         <img src="../../../../media/img/ciim-logo.png" alt="CIIM logo" id="ciim-logo">
         <img src="../../../../media/img/arches_logo.png" alt="Arches logo" id="arches-logo">
