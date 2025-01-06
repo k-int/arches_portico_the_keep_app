@@ -5,7 +5,7 @@ from arches.app.models.system_settings import settings
 
 def populate_latest_resource_edits(apps, schema_editor):
     EditLogModel = apps.get_model("models", "EditLog")
-    LatestResourceEditModel = apps.get_model("arches_ciim_app", "LatestResourceEdit")
+    LatestResourceEditModel = apps.get_model("arches_keep_app", "LatestResourceEdit")
 
     edits = EditLogModel.objects.order_by('resourceinstanceid', '-timestamp').distinct('resourceinstanceid')
 
@@ -23,7 +23,7 @@ def populate_latest_resource_edits(apps, schema_editor):
 
 
 def remove_latest_resource_edits(apps, scheme_editor):
-    latest_edits = apps.get_model("arches_ciim_app", "LatestResourceEdit")
+    latest_edits = apps.get_model("arches_keep_app", "LatestResourceEdit")
 
     for edits in latest_edits.objects.all():
         edits.delete()
