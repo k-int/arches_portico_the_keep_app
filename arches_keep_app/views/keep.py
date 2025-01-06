@@ -10,7 +10,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches.app.models.resource import Resource
-from arches_ciim_app.models import LatestResourceEdit
+from arches_keep_app.models import LatestResourceEdit
 
 from arches.app.models.models import Concept as modelConcept
 from arches.app.models.concept import Concept
