@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="arches_ciim_app",
+    name="arches_keep_app",
     version="0.0.1",
     description="",
     url="",

@@ -2,10 +2,10 @@ define([
     'knockout',
     'arches',
     'js-cookie',
-    'templates/views/components/plugins/ciim_integration_dashboard.htm'
-], function (ko, arches, Cookies, CIIMIntegrationDashboardTemplate) {
+    'templates/views/components/plugins/keep_integration_dashboard.htm'
+], function (ko, arches, Cookies, KeepIntegrationDashboardTemplate) {
 
-    const CIIMIntegrationDashboardViewModel = function () {
+    const KeepIntegrationDashboardViewModel = function () {
         const self = this;
 
         this.selectedStartDate = ko.observable();
@@ -83,8 +83,8 @@ define([
         };
     }
 
-    return ko.components.register('ciim_integration_dashboard', {
-        viewModel: CIIMIntegrationDashboardViewModel,
-        template: CIIMIntegrationDashboardTemplate
+    return ko.components.register('keep_integration_dashboard', {
+        viewModel: KeepIntegrationDashboardViewModel,
+        template: KeepIntegrationDashboardTemplate
     });
 });
