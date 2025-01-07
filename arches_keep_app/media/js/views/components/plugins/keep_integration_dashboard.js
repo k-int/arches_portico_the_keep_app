@@ -25,7 +25,7 @@ define([
                 const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
                 const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
 
-                const baseUrl = `http://127.0.0.1:8000/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=100&page=`;
+                const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=100&page=`;
                 const firstUrl = baseUrl + "1" 
                 
                 fetch(firstUrl)
@@ -76,7 +76,7 @@ define([
                     })
                     })
                     .catch(err => {
-                        console.error("first err", err)
+                        console.error("Fetch error", err)
                         self.errorMsg(err.message);
                     })
             return false
