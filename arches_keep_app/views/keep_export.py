@@ -17,7 +17,7 @@ def print_ids(request):
         resource_ids = body["resourceid_list"]
         period_string = body["period_string"]
         
-        resource_object = {
+        data_object = {
             'monument_entries': [],
             'admin_areas': [],
             'mon_types': [],
@@ -189,7 +189,7 @@ def print_ids(request):
                 if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
                 if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
 
-                resource_object["monument_entries"].append(mon_object)
+                data_object["monument_entries"].append(mon_object)
 
                 #### MonUID2
                 for tile in resource.tiles:
@@ -211,7 +211,7 @@ def print_ids(request):
                         admin_area_object ["AdminAreaType"] = area_type_value.value
                         admin_area_object ["AdminAreaName"] = area_name_value.value
                         
-                        resource_object["admin_areas"].append(admin_area_object)
+                        data_object["admin_areas"].append(admin_area_object)
 
                 # #### MonUID3
 
@@ -275,7 +275,7 @@ def print_ids(request):
                                 valueid=date_qualifier)
                             monument_type_object["DateQualifier"] = date_qualifier_value.value
                         
-                        resource_object["mon_types"].append(monument_type_object)
+                        data_object["mon_types"].append(monument_type_object)
 
                 if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
                 
@@ -290,18 +290,20 @@ def print_ids(request):
                             components_string = "; ".join(component_types_list)
 
                             construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
-                            construction_phase_obj = [construction_phase for construction_phase in resource_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
+
+                            # find the associated construction phase already stored on the data object
+                            construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
 
                             component_obj = copy.deepcopy(construction_phase_obj)
                             component_obj["MonTypeDesc"] = components_string
                             component_obj["RecType"] = "Component Type"
                             component_obj["UID"] = str(tile.tileid)
 
-                            resource_object["mon_types"].append(component_obj)
+                            data_object["mon_types"].append(component_obj)
 
-        xmlxgExportMon = resource_object["monument_entries"]
-        xmlxgExportMonAdminArea = resource_object["admin_areas"]
-        xmlxgExportMonTypeDesc = resource_object["mon_types"]
+        xmlxgExportMon = data_object["monument_entries"]
+        xmlxgExportMonAdminArea = data_object["admin_areas"]
+        xmlxgExportMonTypeDesc = data_object["mon_types"]
 
         xml_object = {
             "dataroot": {
