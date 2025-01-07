@@ -181,9 +181,10 @@ def print_ids(request):
                     if str(tile.nodegroup_id) == id_lookup["national_grid_refs_id"]:  # grid reference
                         grid_ref = tile.data[id_lookup["national_grid_ref_id"]]
                         grid_ref_converted = convert(grid_ref)
-                        mon_object["GridRef"] = grid_ref
-                        mon_object["Easting"] = grid_ref_converted[0]
-                        mon_object["Northing"] = grid_ref_converted[1]
+                        if grid_ref_converted:
+                            mon_object["GridRef"] = grid_ref
+                            mon_object["Easting"] = grid_ref_converted[0]
+                            mon_object["Northing"] = grid_ref_converted[1]
 
                 if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
                 if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
