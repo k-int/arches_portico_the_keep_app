@@ -40,7 +40,8 @@ def print_ids(request):
             'date_start': '77e8f28e-efdc-11eb-b9f5-a87eeabdefba',
             'date_end': '77e8f29f-efdc-11eb-a58e-a87eeabdefba',
             'date_certainty': '77e8f298-efdc-11eb-9465-a87eeabdefba',
-            'date_qualifier': '77e8f294-efdc-11eb-a9a2-a87eeabdefba'
+            'date_qualifier': '77e8f294-efdc-11eb-a9a2-a87eeabdefba',
+            'type_certainty': '77e9065e-efdc-11eb-baa2-a87eeabdefba'
         }
 
         artifact_node_ids = {
@@ -77,7 +78,8 @@ def print_ids(request):
             'date_start': '6c2b6c20-4e8a-11eb-bd7f-f875a44e0e11',
             'date_end': '6c2b6c21-4e8a-11eb-95d9-f875a44e0e11',
             'date_certainty': 'f5711ba7-4e8a-11eb-97c3-f875a44e0e11',
-            'date_qualifier': '6c2b6c22-4e8a-11eb-82fe-f875a44e0e11'
+            'date_qualifier': '6c2b6c22-4e8a-11eb-82fe-f875a44e0e11',
+            'type_certainty': 'b334dddf-4e87-11eb-830e-f875a44e0e11'
         }
 
         for resource_id in resource_ids:
@@ -249,6 +251,10 @@ def print_ids(request):
                                 
                             monument_types_string = "; ".join(monument_types_values)
                             monument_type_object["MonType"] = monument_types_string
+
+                            type_certainty = tile.data[id_lookup["type_certainty"]] # type confidence
+                            if type_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632":
+                                monument_type_object["TypeConf"] = "?"
 
                         if str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
                             monument_type_object["MonType"] = "FINDSPOT"
