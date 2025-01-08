@@ -25,29 +25,18 @@ define([
                 const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
                 const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
 
-                const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=100&page=`;
-                const firstUrl = baseUrl + "1" 
+                const url = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=1000000&page=1`;
                 
-                fetch(firstUrl)
+                fetch(url)
                     .then(response => response.json())
-                    .then(({metadata}) => {
-                        const numberOfPages = metadata.numberOfPages
-                        const fetchPromises = []
-
-                        for (let i = 1; i < numberOfPages; i++) {
-                            pageUrl = baseUrl + String(i)
-                            fetchPromises.push(fetch(pageUrl)
-                                .then(response => response.json())
-                                .then(json => {
-                                    return json.results
-                                        .filter(resource => resource.tiles)
-                                        .map(resource => resource.resourceinstanceid)
-                                })
-                            )
-                        }
-                        return Promise.all(fetchPromises)
-                    })
+                    .then(({results}) => {
+                        const resource_ids = results
+                            .filter(resource => resource.tiles)
+                            .map(resource => resource.resourceinstanceid)
+                        return resource_ids
+                })
                     .then(results => {
+
                         const start_month = startDate.toLocaleString('en-GB', {month: 'long'})
                         const end_month = endDate.toLocaleString('en-GB', {month: 'long'})
                         const start_day = String(startDate.getDate()).padStart(2, '0')
@@ -55,7 +44,7 @@ define([
                         const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}.xsd`
 
                         const body_object = JSON.stringify({
-                            resourceid_list: [...results.flat()],
+                            resourceid_list: results,
                             period_string: period_string
                         })
 
@@ -69,6 +58,7 @@ define([
                         })
                     .then(response => response.text())
                     .then(xmlString => {
+                        console.log("xmlString", xmlString)
                         const blob = new Blob([xmlString], { type: 'application/xml' });
                         const blobUrl = URL.createObjectURL(blob);
                         window.open(blobUrl, '_blank');
