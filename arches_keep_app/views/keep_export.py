@@ -233,8 +233,8 @@ def print_ids(request):
                             'ToConf': None,
                             'UnknownDate': None,
                             'TypeConf': None,
-                            'Currency': None,
-                            'DisplayDate': None,
+                            # 'Currency': None,
+                            # 'DisplayDate': None,
                             'DateQualifier': None
                         }
 
