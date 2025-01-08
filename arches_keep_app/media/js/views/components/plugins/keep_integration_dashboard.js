@@ -58,7 +58,6 @@ define([
                         })
                     .then(response => response.text())
                     .then(xmlString => {
-                        console.log("xmlString", xmlString)
                         const blob = new Blob([xmlString], { type: 'application/xml' });
                         const blobUrl = URL.createObjectURL(blob);
                         window.open(blobUrl, '_blank');
