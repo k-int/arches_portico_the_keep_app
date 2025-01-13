@@ -20,17 +20,40 @@ class LatestResourceEdit(models.Model):
 
     @receiver(post_save, sender=EditLog)
     def update_latest_resource_edit(instance, **kwargs):
-        if LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid).exists():
-            LatestResourceEdit.objects.get(resourceinstanceid=instance.resourceinstanceid).delete()
-        latest_edit = LatestResourceEdit()
-        latest_edit.resourceinstanceid = instance.resourceinstanceid
-        latest_edit.resourcedisplayname = instance.resourcedisplayname
-        latest_edit.edittype = instance.edittype
-        latest_edit.graphid = instance.resourceclassid
-        latest_edit.userid = instance.userid
-        latest_edit.username = instance.user_username
-        latest_edit.timestamp = instance.timestamp
-        latest_edit.save()
+        """Update LatestResourceEdit resource row after EditLog save"""
+        
+        def create_new_latest_resource_edit():
+            latest_edit = LatestResourceEdit()
+            latest_edit.resourceinstanceid = instance.resourceinstanceid
+            latest_edit.resourcedisplayname = instance.resourcedisplayname
+            latest_edit.edittype = instance.edittype
+            latest_edit.graphid = instance.resourceclassid
+            latest_edit.userid = instance.userid
+            latest_edit.username = instance.user_username
+            latest_edit.timestamp = instance.timestamp
+            latest_edit.save()
+
+        if LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid):
+            try:
+                existing_lre = LatestResourceEdit.objects.get(resourceinstanceid=instance.resourceinstanceid)
+                LatestResourceEdit.objects.update_or_create(
+                    editlogid=existing_lre.editlogid,
+                    defaults={
+                        'resourceinstanceid':instance.resourceinstanceid,
+                        'resourcedisplayname':instance.resourcedisplayname,
+                        'edittype':instance.edittype,
+                        'graphid':instance.resourceclassid,
+                        'userid':instance.userid,
+                        'username':instance.user_username,
+                        'timestamp':instance.timestamp
+                    }
+                )
+            except:
+                # more than one row for resourceinstanceid - delete all rows
+                LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid).delete()
+                create_new_latest_resource_edit()
+        else:
+            create_new_latest_resource_edit()
 
     class Meta:
         managed = True
