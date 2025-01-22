@@ -23,6 +23,14 @@ class Migration(migrations.Migration):
             lre.relatededitlogid = edit
             lre.save()
 
+    def remove_all_relatededitlogids(apps, schema_editor):
+        LatestResourceEdit = apps.get_model("arches_ciim_app", "LatestResourceEdit")
+        lres = LatestResourceEdit.objects.all()
+        for lre in lres:
+            lre.relatededitlogid.delete()
+            lre.save()
+            print(vars(lre))
+
     operations = [
         migrations.RenameField(
             model_name='latestresourceedit',
@@ -32,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='latestresourceedit',
             name='relatededitlogid',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='models.editlog'),
+            field=models.OneToOneField(blank=True, db_column='relatededitlogid', null=True, on_delete=django.db.models.deletion.SET_NULL, to='models.editlog'),
         ),
-        migrations.RunPython(update_all_relatededitlogids, None)
+        migrations.RunPython(update_all_relatededitlogids, remove_all_relatededitlogids)
     ]

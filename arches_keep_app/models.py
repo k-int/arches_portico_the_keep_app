@@ -11,7 +11,7 @@ import uuid
 class LatestResourceEdit(models.Model):
     latestresourceeditid = models.UUIDField(primary_key=True, default=uuid.uuid1)
     relatededitlogid = models.OneToOneField(
-        "models.EditLog", on_delete=models.CASCADE, blank=True, null=True)
+        "models.EditLog", db_column="relatededitlogid", on_delete=models.SET_NULL, blank=True, null=True)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
     edittype = models.TextField(blank=True, null=True)
