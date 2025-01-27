@@ -5,7 +5,6 @@ from arches_keep_app.utils.bng_conversion import convert
 
 import xmltodict
 import copy
-from django.http import JsonResponse
 from django.http import HttpResponse
 from datetime import datetime
 import json
@@ -24,6 +23,9 @@ def print_ids(request):
         }
 
         monument_node_ids = {
+            'system_refs_id': '325a2f2f-efe4-11eb-9b0c-a87eeabdefba',
+            'primary_ref_id': '325a2f33-efe4-11eb-b0bb-a87eeabdefba',
+            'legacy_id': '325a441c-efe4-11eb-9283-a87eeabdefba',
             'names_id': '676d47f9-9c1c-11ea-9aa0-f875a44e0e11',
             'name_id': '676d47ff-9c1c-11ea-b07f-f875a44e0e11',
             'descriptions_id': 'ba342e69-b554-11ea-a027-f875a44e0e11',
@@ -45,6 +47,9 @@ def print_ids(request):
         }
 
         artifact_node_ids = {
+            'system_refs_id': 'dd800bc9-b494-11ea-9af8-f875a44e0e11',
+            'primary_ref_id': 'dd8032af-b494-11ea-8110-f875a44e0e11',
+            'legacy_id': 'dd8032b1-b494-11ea-a183-f875a44e0e11',
             'names_id': '5b0dfb23-7fe2-11ea-bf70-f875a44e0e11',
             'name_id': '5b0dfb27-7fe2-11ea-8ac9-f875a44e0e11',
             'descriptions_id': 'c30977ad-991e-11ea-9368-f875a44e0e11',
@@ -63,6 +68,9 @@ def print_ids(request):
         }
 
         area_node_ids = {
+            'system_refs_id': '8dca12af-edeb-11eb-bc5f-a87eeabdefba',
+            'primary_ref_id': '8dca12b3-edeb-11eb-a9ee-a87eeabdefba',
+            'legacy_id': '8dca12bd-edeb-11eb-a6c6-a87eeabdefba',
             'names_id': 'f45dbbe3-80b7-11ea-ae0e-f875a44e0e11',
             'name_id': 'f45dbbe8-80b7-11ea-b325-f875a44e0e11',
             'descriptions_id': 'f3cc1681-185b-11eb-927e-f875a44e0e11',
@@ -130,11 +138,14 @@ def print_ids(request):
                 elif str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72":
                     id_lookup = area_node_ids
 
+            #### Value assignment
+
                 #### MonUID1
             
                 mon_object = {
                     'MonUID': str(resource.resourceinstanceid),
-                    'PrefRef': str(resource.resourceinstanceid),
+                    'PrimaryID': None,
+                    'LegacyID': None,
                     'Name': None,
                     'RecordType': None,
                     'Summary': None,
@@ -148,7 +159,14 @@ def print_ids(request):
                 mon_descriptions =[]
                 mon_summaries = []
 
-                for tile in resource.tiles:
+                primary_id = None
+
+                for tile in resource.tiles: # retrieve id variables
+
+                    if str(tile.nodegroup_id) == id_lookup["system_refs_id"]:  # system refs
+                        mon_object["LegacyID"] = tile.data[id_lookup["legacy_id"]]['en']['value']
+                        mon_object["PrimaryID"] = tile.data[id_lookup["primary_ref_id"]]
+                        primary_id = tile.data[id_lookup["primary_ref_id"]]
 
                     if str(tile.nodegroup_id) == id_lookup["names_id"]:  # names
                         monument_name = tile.data[id_lookup["name_id"]]['en']['value']
@@ -188,15 +206,7 @@ def print_ids(request):
                             mon_object["Easting"] = grid_ref_converted[0]
                             mon_object["Northing"] = grid_ref_converted[1]
 
-                if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
-                if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
-                if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
-
-                data_object["monument_entries"].append(mon_object)
-
-                #### MonUID2
-                for tile in resource.tiles:
-
+                    #### MonUID2
                     if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
 
                         admin_area_object = {
@@ -216,9 +226,8 @@ def print_ids(request):
                         
                         data_object["admin_areas"].append(admin_area_object)
 
-                # #### MonUID3
+                    #### MonUID3 - construction phases
 
-                for tile in resource.tiles:
                     if str(tile.nodegroup_id) == id_lookup["construction_phases"]:  # find construction phase
 
                         monument_type_object = {
@@ -286,9 +295,9 @@ def print_ids(request):
                         
                         data_object["mon_types"].append(monument_type_object)
 
-                if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
-                
-                    for tile in resource.tiles:
+                    ##### MonUID3 - components
+
+                    if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
                         if str(tile.nodegroup_id) == "55d6a53e-049c-11eb-8618-f875a44e0e11":  # find components
 
                             component_types = tile.data["46cd4b7e-049d-11eb-ba3a-f875a44e0e11"]
@@ -310,6 +319,13 @@ def print_ids(request):
                             component_obj["UID"] = str(tile.tileid)
 
                             data_object["mon_types"].append(component_obj)
+
+                #### Finish MonUID1
+                if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
+                if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
+                if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
+
+                data_object["monument_entries"].append(mon_object)
 
         xmlxgExportMon = data_object["monument_entries"]
         xmlxgExportMonAdminArea = data_object["admin_areas"]
