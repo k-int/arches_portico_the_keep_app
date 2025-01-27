@@ -60,6 +60,15 @@ define([
                     .then(xmlString => {
                         const blob = new Blob([xmlString], { type: 'application/xml' });
                         const blobUrl = URL.createObjectURL(blob);
+
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = 'keep_xml_export.xml'; // Specify the desired filename
+                        document.body.appendChild(a);
+
+                        a.click();
+                        document.body.removeChild(a);
+
                         window.open(blobUrl, '_blank');
                         setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
                     })
