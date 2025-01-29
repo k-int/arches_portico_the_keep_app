@@ -5,7 +5,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('arches_ciim_app', '0002_add_plugin'),
+        ('arches_keep_app', '0002_add_plugin'),
     ]
 
     def update_all_relatededitlogids(apps, schema_editor):
@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         Function to update all existing LREs.  If many in the database, this migration could take a while.
         """
         EditLog = apps.get_model("models", "EditLog")
-        LatestResourceEdit = apps.get_model("arches_ciim_app", "LatestResourceEdit")
+        LatestResourceEdit = apps.get_model("arches_keep_app", "LatestResourceEdit")
 
         lres = LatestResourceEdit.objects.all()
         for lre in lres:
@@ -31,10 +31,10 @@ class Migration(migrations.Migration):
     # NOTE: this is a very hacky method to get the reverse migration to work.  
     # Reversing migration with "models.editlog" string produces error `ValueError: Related model 'models.editlog' cannot be resolved` ...
     # ... as for some unknown reason django can't see the arches models app in reverse.  In reverse if we have the model name as ...
-    # ... arches_ciim_app.latestresourceedit then the migration can reverse successfully, despite not looking at the correct linked table (editlog)
-    applied_migrations = MigrationRecorder.Migration.objects.filter(app="arches_ciim_app").values_list('name', flat=True)
+    # ... arches_keep_app.latestresourceedit then the migration can reverse successfully, despite not looking at the correct linked table (editlog)
+    applied_migrations = MigrationRecorder.Migration.objects.filter(app="arches_keep_app").values_list('name', flat=True)
     if "0003_relatededitlogid_fk" in applied_migrations:
-        model_name = "arches_ciim_app.latestresourceedit"
+        model_name = "arches_keep_app.latestresourceedit"
     else:
         model_name = "models.editlog"
 
