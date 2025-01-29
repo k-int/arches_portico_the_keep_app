@@ -1,4 +1,5 @@
 from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
 from arches.app.models.models import Value
 
 from arches_keep_app.utils.bng_conversion import convert
@@ -142,10 +143,21 @@ def print_ids(request):
 
                 #### MonUID1
             
+                system_refs_tile = Tile.objects.get(resourceinstance_id = resource.resourceinstanceid, nodegroup_id = id_lookup["system_refs_id"]) 
+
+                primary_id = system_refs_tile.data[id_lookup["primary_ref_id"]]
+
+                if not primary_id:
+                    raise ValueError(f"Resource {resource.resourceinstanceid} is missing a Primary ID")
+
+                if system_refs_tile.data[id_lookup["legacy_id"]]:
+                    legacy_id = system_refs_tile.data[id_lookup["legacy_id"]]['en']['value']
+                else: 
+                    legacy_id = None
+
                 mon_object = {
-                    'MonUID': str(resource.resourceinstanceid),
-                    'PrimaryID': None,
-                    'LegacyID': None,
+                    'MonUID': primary_id,
+                    'LegacyID': legacy_id,
                     'Name': None,
                     'RecordType': None,
                     'Summary': None,
@@ -159,14 +171,7 @@ def print_ids(request):
                 mon_descriptions =[]
                 mon_summaries = []
 
-                primary_id = None
-
                 for tile in resource.tiles: # retrieve id variables
-
-                    if str(tile.nodegroup_id) == id_lookup["system_refs_id"]:  # system refs
-                        mon_object["LegacyID"] = tile.data[id_lookup["legacy_id"]]['en']['value']
-                        mon_object["PrimaryID"] = tile.data[id_lookup["primary_ref_id"]]
-                        primary_id = tile.data[id_lookup["primary_ref_id"]]
 
                     if str(tile.nodegroup_id) == id_lookup["names_id"]:  # names
                         monument_name = tile.data[id_lookup["name_id"]]['en']['value']
@@ -210,7 +215,8 @@ def print_ids(request):
                     if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
 
                         admin_area_object = {
-                            'MonUID': str(resource.resourceinstanceid),
+                            'MonUID': primary_id,
+                            'LegacyID': legacy_id,
                             'AdminAreaType': None,
                             'AdminAreaName': None
                             }
@@ -232,7 +238,8 @@ def print_ids(request):
 
                         monument_type_object = {
                             'UID': str(tile.tileid),
-                            'MonUID': str(resource.resourceinstanceid),
+                            'MonUID': primary_id,
+                            'LegacyID': legacy_id,
                             'MonTypeDesc': None,
                             'RecType': 'Monument Type',
                             'MonType': None,
