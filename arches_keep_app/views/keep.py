@@ -16,6 +16,8 @@ from arches.app.models.models import Concept as modelConcept
 from arches.app.models.concept import Concept
 from arches.app.utils.skos import SKOSWriter, SKOSReader
 
+from guardian.models import UserObjectPermission
+
 from arches import __version__
 
 #Decorators
@@ -104,7 +106,12 @@ class ChangesView(View):
         #Data
         db_data = get_data(from_date, to_date, per_page, page)
 
-        json_data = download_data(db_data[0])
+        permissions = UserObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+        no_access_list = [permission['object_pk'] for permission in permissions]
+
+        filtered_data = [latest_edit for latest_edit in db_data[0] if latest_edit.resourceinstanceid not in no_access_list] 
+
+        json_data = download_data(filtered_data)
 
         end_time = time()
 
