@@ -9,7 +9,9 @@ from arches.app.models.models import EditLog
 import uuid
 
 class LatestResourceEdit(models.Model):
-    editlogid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    latestresourceeditid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    relatededitlogid = models.OneToOneField(
+        "models.EditLog", db_column="relatededitlogid", on_delete=models.PROTECT, blank=True, null=True)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
     edittype = models.TextField(blank=True, null=True)
@@ -20,17 +22,42 @@ class LatestResourceEdit(models.Model):
 
     @receiver(post_save, sender=EditLog)
     def update_latest_resource_edit(instance, **kwargs):
-        if LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid).exists():
-            LatestResourceEdit.objects.get(resourceinstanceid=instance.resourceinstanceid).delete()
-        latest_edit = LatestResourceEdit()
-        latest_edit.resourceinstanceid = instance.resourceinstanceid
-        latest_edit.resourcedisplayname = instance.resourcedisplayname
-        latest_edit.edittype = instance.edittype
-        latest_edit.graphid = instance.resourceclassid
-        latest_edit.userid = instance.userid
-        latest_edit.username = instance.user_username
-        latest_edit.timestamp = instance.timestamp
-        latest_edit.save()
+        """Update LatestResourceEdit resource row after EditLog save"""
+        
+        def create_new_latest_resource_edit():
+            latest_edit = LatestResourceEdit()
+            latest_edit.resourceinstanceid = instance.resourceinstanceid
+            latest_edit.resourcedisplayname = instance.resourcedisplayname
+            latest_edit.edittype = instance.edittype
+            latest_edit.graphid = instance.resourceclassid
+            latest_edit.userid = instance.userid
+            latest_edit.username = instance.user_username
+            latest_edit.timestamp = instance.timestamp
+            latest_edit.relatededitlogid = instance
+            latest_edit.save()
+
+        if LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid):
+            try:
+                existing_lre = LatestResourceEdit.objects.get(resourceinstanceid=instance.resourceinstanceid)
+                LatestResourceEdit.objects.update_or_create(
+                    latestresourceeditid=existing_lre.latestresourceeditid,
+                    defaults={
+                        'resourceinstanceid':instance.resourceinstanceid,
+                        'resourcedisplayname':instance.resourcedisplayname,
+                        'edittype':instance.edittype,
+                        'graphid':instance.resourceclassid,
+                        'userid':instance.userid,
+                        'username':instance.user_username,
+                        'timestamp':instance.timestamp,
+                        'relatededitlogid':instance
+                    }
+                )
+            except:
+                # more than one row for resourceinstanceid - delete all rows
+                LatestResourceEdit.objects.filter(resourceinstanceid=instance.resourceinstanceid).delete()
+                create_new_latest_resource_edit()
+        else:
+            create_new_latest_resource_edit()
 
     class Meta:
         managed = True

@@ -4,6 +4,7 @@ from arches.app.models.models import Value
 
 from arches_keep_app.utils.bng_conversion import convert
 
+import warnings
 import xmltodict
 import copy
 from django.http import HttpResponse
@@ -97,8 +98,6 @@ def print_ids(request):
                 resourceinstanceid = resource_id) 
             resource.load_tiles()
 
-            # print(resource.resourceinstanceid)
-
             #### Inclusion checks
 
             exclude_flag = False
@@ -142,18 +141,22 @@ def print_ids(request):
             #### Value assignment
 
                 #### MonUID1
-            
-                system_refs_tile = Tile.objects.get(resourceinstance_id = resource.resourceinstanceid, nodegroup_id = id_lookup["system_refs_id"]) 
 
-                primary_id = system_refs_tile.data[id_lookup["primary_ref_id"]]
+                primary_id = None
+                legacy_id = None
+            
+                system_refs_tile = Tile.objects.filter(resourceinstance_id = resource.resourceinstanceid, nodegroup_id = id_lookup["system_refs_id"]) 
+
+                if len(system_refs_tile) == 1:
+
+                    if system_refs_tile[0].data[id_lookup["primary_ref_id"]]:
+                        primary_id = system_refs_tile[0].data[id_lookup["primary_ref_id"]]
+
+                    if system_refs_tile[0].data[id_lookup["legacy_id"]]:
+                        legacy_id = system_refs_tile[0].data[id_lookup["legacy_id"]]['en']['value']
 
                 if not primary_id:
-                    raise ValueError(f"Resource {resource.resourceinstanceid} is missing a Primary ID")
-
-                if system_refs_tile.data[id_lookup["legacy_id"]]:
-                    legacy_id = system_refs_tile.data[id_lookup["legacy_id"]]['en']['value']
-                else: 
-                    legacy_id = None
+                    warnings.warn(f"Warning, resource with id {resource.resourceinstanceid} is missing a primary_id")
 
                 mon_object = {
                     'MonUID': primary_id,
