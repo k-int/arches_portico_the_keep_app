@@ -63,7 +63,7 @@ define([
 
                         const a = document.createElement('a');
                         a.href = blobUrl;
-                        a.download = 'keep_xml_export.xml'; // Specify the desired filename
+                        a.download = 'keep_xml_export.xml';
                         document.body.appendChild(a);
 
                         a.click();
