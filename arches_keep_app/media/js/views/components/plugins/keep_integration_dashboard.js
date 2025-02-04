@@ -38,29 +38,27 @@ define([
             fetch(baseUrl + "1")
                 .then(response => response.json())
                 .then((json) => {
-                    const firstResults = 
-                        json.results
-                            .filter(resource => resource.tiles)
-                            .map(resource => resource.resourceinstanceid)
+                    const firstResults = json.results
 
                     const numberOfPages = json.metadata.numberOfPages
-                    const fetchPromises = [firstResults]
+                    const fetchPromises = [Promise.resolve(firstResults)]
 
                     for (let i = 2; i <= numberOfPages; i++) {
-                        pageUrl = baseUrl + String(i)
+                        const pageUrl = baseUrl + String(i)
                         fetchPromises.push(fetch(pageUrl)
                             .then(response => response.json())
                             .then(json => {
                                 return json.results
-                                    .filter(resource => resource.tiles)
-                                    .map(resource => resource.resourceinstanceid)
                             })
                         )
                     }
                     return Promise.all(fetchPromises)
                 })
                 .then((results) => {
-                    resourceid_list = [...results.flat()]
+                    const results_list = [...results.flat()]
+                    resourceid_list = results_list
+                        .filter(resource => resource.tiles)
+                        .map(resource => resource.resourceinstanceid)
 
                     const body_object = JSON.stringify({
                         resourceid_list: resourceid_list,
