@@ -161,6 +161,7 @@ def print_ids(request):
                 mon_object = {
                     'MonUID': primary_id,
                     'LegacyID': legacy_id,
+                    'ArchesResourceID': resource.resourceinstanceid,
                     'Name': None,
                     'RecordType': None,
                     'Summary': None,
@@ -243,7 +244,6 @@ def print_ids(request):
                             'UID': str(tile.tileid),
                             'MonUID': primary_id,
                             'LegacyID': legacy_id,
-                            'MonTypeDesc': None,
                             'RecType': 'Monument Type',
                             'MonType': None,
                             'FromDate': None,
@@ -252,8 +252,6 @@ def print_ids(request):
                             'ToConf': None,
                             'UnknownDate': None,
                             'TypeConf': None,
-                            # 'Currency': None,
-                            # 'DisplayDate': None,
                             'DateQualifier': None
                         }
 
@@ -270,7 +268,6 @@ def print_ids(request):
                                 
                             monument_types_string = "; ".join(monument_types_values)
                             monument_type_object["MonType"] = monument_types_string
-                            monument_type_object["MonTypeDesc"] = monument_types_string
 
                             type_certainty = tile.data[id_lookup["type_certainty"]] # type confidence
                             if type_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632":
@@ -278,7 +275,6 @@ def print_ids(request):
 
                         if str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
                             monument_type_object["MonType"] = "FINDSPOT"
-                            monument_type_object["MonTypeDesc"] = "FINDSPOT"
 
                         date_start = tile.data[id_lookup["date_start"]]
                         if isinstance(date_start, str):
@@ -324,7 +320,6 @@ def print_ids(request):
 
                             component_obj = copy.deepcopy(construction_phase_obj)
                             component_obj["MonType"] = components_string
-                            component_obj["MonTypeDesc"] = components_string
                             component_obj["RecType"] = "Component Type"
                             component_obj["UID"] = str(tile.tileid)
 
