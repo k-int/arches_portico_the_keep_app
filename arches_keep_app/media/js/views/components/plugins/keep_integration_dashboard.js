@@ -14,6 +14,8 @@ define([
 
         this.onSubmit = function () {
 
+            self.errorMsg("")
+
             const startDate = new Date(self.selectedStartDate());
             const endDate = new Date(self.selectedEndDate());
 
@@ -24,6 +26,7 @@ define([
             const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}.xsd`
 
             if (endDate < startDate) {
+                self.errorMsg("End date cannot be earlier than the start date.")
                 throw new Error("End date cannot be earlier than the start date.");
             }
 
