@@ -73,22 +73,22 @@ define([
                                 'Content-Type': 'application/json',
                             }
                     })
-                .then(response => response.text())
-                .then(xmlString => {
-                    const blob = new Blob([xmlString], { type: 'application/xml' });
-                    const blobUrl = URL.createObjectURL(blob);
+                    .then(response => response.text())
+                    .then(xmlString => {
+                        const blob = new Blob([xmlString], { type: 'application/xml' });
+                        const blobUrl = URL.createObjectURL(blob);
 
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = period_string + '.xml';
-                    document.body.appendChild(a);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = period_string + '.xml';
+                        document.body.appendChild(a);
 
-                    a.click();
-                    document.body.removeChild(a);
+                        a.click();
+                        document.body.removeChild(a);
 
-                    window.open(blobUrl, '_blank');
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                })
+                        window.open(blobUrl, '_blank');
+                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    })
                 })
                 .catch(err => {
                     console.error("Fetch error", err)
