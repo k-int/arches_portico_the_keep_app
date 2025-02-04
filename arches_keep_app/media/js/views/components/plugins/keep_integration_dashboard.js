@@ -23,7 +23,7 @@ define([
             const end_month = endDate.toLocaleString('en-GB', {month: 'long'})
             const start_day = String(startDate.getDate()).padStart(2, '0')
             const end_day = String(endDate.getDate()).padStart(2, '0')
-            const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}.xsd`
+            const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}`
 
             if (endDate < startDate) {
                 self.errorMsg("End date cannot be earlier than the start date.")
@@ -80,7 +80,7 @@ define([
 
                     const a = document.createElement('a');
                     a.href = blobUrl;
-                    a.download = 'keep_xml_export.xml';
+                    a.download = period_string + '.xml';
                     document.body.appendChild(a);
 
                     a.click();

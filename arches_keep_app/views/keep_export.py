@@ -345,7 +345,7 @@ def print_ids(request):
             "dataroot": {
                 "@xmlns:od": "urn:schemas-microsoft-com:officedata",
                 "@xmlns:xsi": "http://www.w3.org/2001/XMLSchema-instance",
-                "@xsi:noNamespaceSchemaLocation": period_string,
+                "@xsi:noNamespaceSchemaLocation": period_string + '.xsd',
                 "@generated": datetime.now().isoformat(timespec='seconds'),
                 "xmlxgExportMon": xmlxgExportMon,
                 "xmlxgExportMonAdminArea": xmlxgExportMonAdminArea,
