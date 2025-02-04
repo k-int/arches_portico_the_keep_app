@@ -80,13 +80,13 @@ define([
                     const blob = new Blob([xmlString], { type: 'application/xml' });
                     const blobUrl = URL.createObjectURL(blob);
 
-                    // const a = document.createElement('a');
-                    // a.href = blobUrl;
-                    // a.download = 'keep_xml_export.xml';
-                    // document.body.appendChild(a);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = 'keep_xml_export.xml';
+                    document.body.appendChild(a);
 
-                    // a.click();
-                    // document.body.removeChild(a);
+                    a.click();
+                    document.body.removeChild(a);
 
                     window.open(blobUrl, '_blank');
                     setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
