@@ -14,6 +14,8 @@ define([
 
         this.onSubmit = function () {
 
+            const t0 = performance.now();
+
             self.errorMsg("")
 
             const startDate = new Date(self.selectedStartDate());
@@ -60,6 +62,11 @@ define([
                         .filter(resource => resource.tiles)
                         .map(resource => resource.resourceinstanceid)
 
+                    console.log("Number of resources retrieved: ", resourceid_list.length) 
+
+                    const t1 = performance.now();
+                    console.log("Time elapsed: ", t1-t0)
+
                     const body_object = JSON.stringify({
                         resourceid_list: resourceid_list,
                         period_string: period_string
@@ -76,18 +83,18 @@ define([
                     .then(response => response.text())
                     .then(xmlString => {
                         const blob = new Blob([xmlString], { type: 'application/xml' });
-                        const blobUrl = URL.createObjectURL(blob);
+                        // const blobUrl = URL.createObjectURL(blob);
 
-                        const a = document.createElement('a');
-                        a.href = blobUrl;
-                        a.download = period_string + '.xml';
-                        document.body.appendChild(a);
+                        // const a = document.createElement('a');
+                        // a.href = blobUrl;
+                        // a.download = period_string + '.xml';
+                        // document.body.appendChild(a);
 
-                        a.click();
-                        document.body.removeChild(a);
+                        // a.click();
+                        // document.body.removeChild(a);
 
-                        window.open(blobUrl, '_blank');
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                        // window.open(blobUrl, '_blank');
+                        // setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
                     })
                 })
                 .catch(err => {
