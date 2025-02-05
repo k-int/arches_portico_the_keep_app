@@ -42,14 +42,16 @@ define([
                 const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
                 const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
 
-                const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=10&page=`;
+                const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=100&page=`;
                 
                 fetch(baseUrl + "1")
                     .then(response => response.json())
                     .then((json) => {
                         
                         const firstResults = json.results
-                        console.log(json.metadata)
+                            .filter(resource => resource.tiles)
+                            .map(resource => resource.resourceinstanceid)
+                        
                         const numberOfPages = json.metadata.numberOfPages
                         const fetchPromises = [Promise.resolve(firstResults)]
 
@@ -60,20 +62,20 @@ define([
                             self.loadingInfo.pop()
                             self.loadingInfo.push(`Page ${i} of ${numberOfPages} received...`)
                             const pageUrl = baseUrl + String(i)
-                            fetchPromises.push(fetch(pageUrl)
-                                .then(response => response.json())
-                                .then(json => {
-                                    return json.results
-                                })
+                            fetchPromises.push(
+                                fetch(pageUrl)
+                                    .then(response => response.json())
+                                    .then(json => {
+                                        return json.results
+                                            .filter(resource => resource.tiles)
+                                            .map(resource => resource.resourceinstanceid)
+                                    })
                             )
                         }
                         return Promise.all(fetchPromises)
                     })
                     .then((results) => {
-                        const results_list = [...results.flat()]
-                        resourceid_list = results_list
-                            .filter(resource => resource.tiles)
-                            .map(resource => resource.resourceinstanceid)
+                        const resourceid_list = [...results.flat()]
 
                         console.log("Number of resources retrieved: ", resourceid_list.length) 
 
