@@ -47,6 +47,8 @@ define([
                 fetch(baseUrl + "1")
                     .then(response => response.json())
                     .then((json) => {
+
+                        console.log("Number of resources: ", json.metadata.totalNumberOfResources) 
                         
                         const firstResults = json.results
                             .filter(resource => resource.tiles)
@@ -58,14 +60,17 @@ define([
                         self.loadingInfo.push(`${numberOfPages} pages to fetch...`)
                         self.loadingInfo.push(`Page 1 of ${numberOfPages} received...`)
 
+                        let pageCounter = 2
+
                         for (let i = 2; i <= numberOfPages; i++) {
-                            self.loadingInfo.pop()
-                            self.loadingInfo.push(`Page ${i} of ${numberOfPages} received...`)
                             const pageUrl = baseUrl + String(i)
                             fetchPromises.push(
                                 fetch(pageUrl)
-                                    .then(response => response.json())
-                                    .then(json => {
+                                .then(response => response.json())
+                                .then(json => {
+                                        let page = pageCounter++
+                                        self.loadingInfo.pop()
+                                        self.loadingInfo.push(`Page ${page} of ${numberOfPages} received...`)
                                         return json.results
                                             .filter(resource => resource.tiles)
                                             .map(resource => resource.resourceinstanceid)
@@ -77,7 +82,7 @@ define([
                     .then((results) => {
                         const resourceid_list = [...results.flat()]
 
-                        console.log("Number of resources retrieved: ", resourceid_list.length) 
+                        console.log("Number of resources filtered: ", resourceid_list.length) 
 
                         const t1 = performance.now();
                         console.log("Api calls complete. Time elapsed: ", t1-t0)
