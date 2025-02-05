@@ -84,6 +84,11 @@
         display: inline-block;
     }
 
+    .loading-spinner {
+        font-size: 2em;
+        margin-left: 20px;
+}
+
 </style>
 
 <div class="dashboard-page">
@@ -107,7 +112,11 @@
                     <input type="date" data-bind="value: selectedEndDate" id="dateTo" name="dateTo">
                 </label>
                 <p data-bind="text: errorMsg, visible: errorMsg" class = "error-msg"></p>
-                <button class="btn btn-primary" type="submit">Download</button>
+                <ul data-bind="foreach: loadingInfo, visible: loadingInfo().length > 0" class="loading-info">
+                    <li data-bind="text: $data"></li>
+                </ul>
+                <button data-bind="visible: !loading()" class="btn btn-primary" type="submit">Download</button>
+                <i data-bind="visible: loading()" class="fa fa-spin fa-spinner loading-spinner"></i>
             </form>
 
         </div>

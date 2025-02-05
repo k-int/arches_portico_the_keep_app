@@ -11,96 +11,119 @@ define([
         this.selectedStartDate = ko.observable();
         this.selectedEndDate = ko.observable();
         this.errorMsg = ko.observable()
+        this.loading = ko.observable(false)
+        this.loadingInfo = ko.observableArray()
 
         this.onSubmit = function () {
 
-            const t0 = performance.now();
+            try{
+                const t0 = performance.now();
+                
+                self.loading(true)
+                self.loadingInfo.removeAll()
+                self.loadingInfo.push("Making initial API call...")
+                self.errorMsg("")
 
-            self.errorMsg("")
+                const startDate = new Date(self.selectedStartDate());
+                const endDate = new Date(self.selectedEndDate());
 
-            const startDate = new Date(self.selectedStartDate());
-            const endDate = new Date(self.selectedEndDate());
+                const start_month = startDate.toLocaleString('en-GB', {month: 'long'})
+                const end_month = endDate.toLocaleString('en-GB', {month: 'long'})
+                const start_day = String(startDate.getDate()).padStart(2, '0')
+                const end_day = String(endDate.getDate()).padStart(2, '0')
+                const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}`
 
-            const start_month = startDate.toLocaleString('en-GB', {month: 'long'})
-            const end_month = endDate.toLocaleString('en-GB', {month: 'long'})
-            const start_day = String(startDate.getDate()).padStart(2, '0')
-            const end_day = String(endDate.getDate()).padStart(2, '0')
-            const period_string = `Mon_Export_${start_month}_${start_day}_to_${end_month}_${end_day}`
+                if (endDate < startDate) {
+                    self.loadingInfo.removeAll()
+                    self.errorMsg("End date cannot be earlier than the start date.")
+                    throw new Error("End date cannot be earlier than the start date.")
+                }
 
-            if (endDate < startDate) {
-                self.errorMsg("End date cannot be earlier than the start date.")
-                throw new Error("End date cannot be earlier than the start date.");
-            }
+                const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
+                const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
 
-            const formattedStartDate = `${startDate.getDate()}-${startDate.getMonth() + 1}-${startDate.getFullYear()}`
-            const formattedEndDate = `${endDate.getDate()}-${endDate.getMonth() + 1}-${endDate.getFullYear()}`
+                const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=10&page=`;
+                
+                fetch(baseUrl + "1")
+                    .then(response => response.json())
+                    .then((json) => {
+                        
+                        const firstResults = json.results
+                        console.log(json.metadata)
+                        const numberOfPages = json.metadata.numberOfPages
+                        const fetchPromises = [Promise.resolve(firstResults)]
 
-            const baseUrl = `${window.location["origin"]}/resource/changes?from=${formattedStartDate}T00:00:00Z&to=${formattedEndDate}T00:00:00Z&sortField=id&sortOrder=asc&perPage=100&page=`;
-            
-            fetch(baseUrl + "1")
-                .then(response => response.json())
-                .then((json) => {
-                    const firstResults = json.results
+                        self.loadingInfo.push(`${numberOfPages} pages to fetch...`)
+                        self.loadingInfo.push(`Page 1 of ${numberOfPages} received...`)
 
-                    const numberOfPages = json.metadata.numberOfPages
-                    const fetchPromises = [Promise.resolve(firstResults)]
-
-                    for (let i = 2; i <= numberOfPages; i++) {
-                        const pageUrl = baseUrl + String(i)
-                        fetchPromises.push(fetch(pageUrl)
-                            .then(response => response.json())
-                            .then(json => {
-                                return json.results
-                            })
-                        )
-                    }
-                    return Promise.all(fetchPromises)
-                })
-                .then((results) => {
-                    const results_list = [...results.flat()]
-                    resourceid_list = results_list
-                        .filter(resource => resource.tiles)
-                        .map(resource => resource.resourceinstanceid)
-
-                    console.log("Number of resources retrieved: ", resourceid_list.length) 
-
-                    const t1 = performance.now();
-                    console.log("Time elapsed: ", t1-t0)
-
-                    const body_object = JSON.stringify({
-                        resourceid_list: resourceid_list,
-                        period_string: period_string
+                        for (let i = 2; i <= numberOfPages; i++) {
+                            self.loadingInfo.pop()
+                            self.loadingInfo.push(`Page ${i} of ${numberOfPages} received...`)
+                            const pageUrl = baseUrl + String(i)
+                            fetchPromises.push(fetch(pageUrl)
+                                .then(response => response.json())
+                                .then(json => {
+                                    return json.results
+                                })
+                            )
+                        }
+                        return Promise.all(fetchPromises)
                     })
+                    .then((results) => {
+                        const results_list = [...results.flat()]
+                        resourceid_list = results_list
+                            .filter(resource => resource.tiles)
+                            .map(resource => resource.resourceinstanceid)
 
-                    return fetch('/keep/export/', {
-                            method: 'POST',
-                            body: body_object,
-                            headers: {
-                                "X-CSRFToken": Cookies.get('csrftoken'),
-                                'Content-Type': 'application/json',
-                            }
+                        console.log("Number of resources retrieved: ", resourceid_list.length) 
+
+                        const t1 = performance.now();
+                        console.log("Api calls complete. Time elapsed: ", t1-t0)
+                        self.loadingInfo.push(`Converting results to XML...`)
+
+                        const body_object = JSON.stringify({
+                            resourceid_list: resourceid_list,
+                            period_string: period_string
+                        })
+
+                        return fetch('/keep/export/', {
+                                method: 'POST',
+                                body: body_object,
+                                headers: {
+                                    "X-CSRFToken": Cookies.get('csrftoken'),
+                                    'Content-Type': 'application/json',
+                                }
+                        })
+                        .then(response => response.text())
+                        .then(xmlString => {
+                            self.loadingInfo.push(`Creating XML download...`)
+                            const blob = new Blob([xmlString], { type: 'application/xml' });
+                            const blobUrl = URL.createObjectURL(blob);
+
+                            const a = document.createElement('a');
+                            a.href = blobUrl;
+                            a.download = period_string + '.xml';
+                            document.body.appendChild(a);
+
+                            a.click();
+                            document.body.removeChild(a);
+
+                            window.open(blobUrl, '_blank');
+                            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                        })
                     })
-                    .then(response => response.text())
-                    .then(xmlString => {
-                        const blob = new Blob([xmlString], { type: 'application/xml' });
-                        // const blobUrl = URL.createObjectURL(blob);
-
-                        // const a = document.createElement('a');
-                        // a.href = blobUrl;
-                        // a.download = period_string + '.xml';
-                        // document.body.appendChild(a);
-
-                        // a.click();
-                        // document.body.removeChild(a);
-
-                        // window.open(blobUrl, '_blank');
-                        // setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                    .catch(err => {
+                        self.loadingInfo.removeAll()
+                        console.error("Fetch error", err)
+                        self.errorMsg(err.message);
                     })
-                })
-                .catch(err => {
-                    console.error("Fetch error", err)
-                    self.errorMsg(err.message);
-                })
+                    .finally (() => {
+                        self.loading(false)
+                    })
+            } catch (err) {
+                console.error("Error", err)
+                self.loading(false)
+            } 
             return false
         };
     }
