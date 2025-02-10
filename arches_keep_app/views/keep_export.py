@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from datetime import datetime
 import json
 
-def print_ids(request):
+def process_resource(request):
     if request.method == 'POST':
 
         body = json.loads(request.body)

@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.urls import path, re_path
 from arches_keep_app.views.keep import ChangesView, ConceptsExportView
-from arches_keep_app.views.keep_export import print_ids
+from arches_keep_app.views.keep_export import process_resource
 
 urlpatterns = [
     re_path(r"^resource/changes", ChangesView.as_view(), name="ChangesView"),
     re_path(r"^concept/export", ConceptsExportView.as_view(), name="ConceptsExportView"),    
-    re_path(r"^keep/export/$", print_ids, name='print_ids'),
+    re_path(r"^keep/export/$", process_resource, name='process_resource'),
 ]
