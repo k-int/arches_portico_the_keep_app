@@ -127,7 +127,7 @@ define([
                     .finally (() => {
                         self.loading(false)
                         const t2 = performance.now();
-                        console.log("XML compiled. Time elapsed: ", t2-t1)
+                        console.log("XML compiled. Time elapsed: ", t2-t0)
                     })
             } catch (err) {
                 console.error("Error", err)
