@@ -335,7 +335,7 @@ def process_resource(request):
                     data_object["monument_entries"].append(mon_object)
 
             except Exception as e:
-                print(f"ERROR: whilst processing {resource.resourceinstanceid}: {e}")
+                print(f"ERROR: whilst processing {resource_id}: {e}")
 
         xmlxgExportMon = data_object["monument_entries"]
         xmlxgExportMonAdminArea = data_object["admin_areas"]
