@@ -94,243 +94,248 @@ def process_resource(request):
 
         for resource_id in resource_ids:
 
-            resource = Resource.objects.get(
-                resourceinstanceid = resource_id) 
-            resource.load_tiles()
+            try:
 
-            #### Inclusion checks
+                resource = Resource.objects.get(
+                    resourceinstanceid = resource_id) 
+                resource.load_tiles()
 
-            exclude_flag = False
+                #### Inclusion checks
 
-            if str(resource.graph_id) not in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", "343cc20c-2c5a-11e8-90fa-0242ac120005", "979aaf0b-7042-11ea-9674-287fcf6a5e72"]:
-                exclude_flag = True
+                exclude_flag = False
 
-            if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9": # monument exclusions
-                for tile in resource.tiles:
-                    if str(tile.nodegroup_id) == "6af2a0cb-efc5-11eb-8436-a87eeabdefba": # designation and protection assignment
-                        if tile.data["6af2b696-efc5-11eb-b0b5-a87eeabdefba"]: 
+                if str(resource.graph_id) not in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", "343cc20c-2c5a-11e8-90fa-0242ac120005", "979aaf0b-7042-11ea-9674-287fcf6a5e72"]:
+                    exclude_flag = True
+
+                if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9": # monument exclusions
+                    for tile in resource.tiles:
+                        if str(tile.nodegroup_id) == "6af2a0cb-efc5-11eb-8436-a87eeabdefba": # designation and protection assignment
+                            if tile.data["6af2b696-efc5-11eb-b0b5-a87eeabdefba"]: 
+                                exclude_flag = True
+
+                        if str(tile.nodegroup_id) == "055b3e3f-04c7-11eb-8d64-f875a44e0e11": # Associated Monuments, Areas or Artefacts
+                            assoc_monument_ids = [assoc_resource["resourceId"] for assoc_resource in tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]] # Associated Monument, Area or Artefact
+                            for id in assoc_monument_ids:
+                                assoc_resource = Resource.objects.get(
+                                    resourceinstanceid = id)
+                                if str(assoc_resource.graph_id) == "b8032b00-594d-11e9-9cf0-18cf5eb368c4": # aircraft monument
+                                    exclude_flag = True
+                                if str(assoc_resource.graph_id) == "49bac32e-5464-11e9-a6e2-000d3ab1e588": # maritime vessel
+                                    exclude_flag = True
+
+                if str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72": # area exclusions
+                    for tile in resource.tiles:
+                        if str(tile.nodegroup_id) == "a4a81528-efa9-11eb-9abd-a87eeabdefba": # designation and protection assignment
                             exclude_flag = True
 
-                    if str(tile.nodegroup_id) == "055b3e3f-04c7-11eb-8d64-f875a44e0e11": # Associated Monuments, Areas or Artefacts
-                        assoc_monument_ids = [assoc_resource["resourceId"] for assoc_resource in tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]] # Associated Monument, Area or Artefact
-                        for id in assoc_monument_ids:
-                            assoc_resource = Resource.objects.get(
-                                resourceinstanceid = id)
-                            if str(assoc_resource.graph_id) == "b8032b00-594d-11e9-9cf0-18cf5eb368c4": # aircraft monument
-                                exclude_flag = True
-                            if str(assoc_resource.graph_id) == "49bac32e-5464-11e9-a6e2-000d3ab1e588": # maritime vessel
-                                exclude_flag = True
+                        if str(tile.nodegroup_id) == "d17a5389-28cd-11eb-9670-f875a44e0e11": # area assignment
+                            exclude_flag = True
 
-            if str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72": # area exclusions
-                for tile in resource.tiles:
-                    if str(tile.nodegroup_id) == "a4a81528-efa9-11eb-9abd-a87eeabdefba": # designation and protection assignment
-                        exclude_flag = True
-
-                    if str(tile.nodegroup_id) == "d17a5389-28cd-11eb-9670-f875a44e0e11": # area assignment
-                        exclude_flag = True
-
-            if not exclude_flag:
-                
-                if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9":
-                    id_lookup = monument_node_ids
-                elif str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
-                    id_lookup = artifact_node_ids
-                elif str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72":
-                    id_lookup = area_node_ids
-
-            #### Value assignment
-
-                #### MonUID1
-
-                primary_id = None
-                legacy_id = None
-            
-                system_refs_tile = Tile.objects.filter(resourceinstance_id = resource.resourceinstanceid, nodegroup_id = id_lookup["system_refs_id"]) 
-
-                if len(system_refs_tile) == 1:
-
-                    if system_refs_tile[0].data[id_lookup["primary_ref_id"]]:
-                        primary_id = system_refs_tile[0].data[id_lookup["primary_ref_id"]]
-
-                    if system_refs_tile[0].data[id_lookup["legacy_id"]]:
-                        legacy_id = system_refs_tile[0].data[id_lookup["legacy_id"]]['en']['value']
-
-                if not primary_id:
-                    warnings.warn(f"Warning, resource with id {resource.resourceinstanceid} is missing a primary_id")
-
-                mon_object = {
-                    'MonUID': primary_id,
-                    'LegacyID': legacy_id,
-                    'ArchesResourceID': resource.resourceinstanceid,
-                    'Name': None,
-                    'RecordType': None,
-                    'Summary': None,
-                    'Description': None,
-                    'GridRef': None,
-                    'Easting': None,
-                    'Northing': None
-                }
-
-                mon_names = []
-                mon_descriptions =[]
-                mon_summaries = []
-
-                for tile in resource.tiles: # retrieve id variables
-
-                    if str(tile.nodegroup_id) == id_lookup["names_id"]:  # names
-                        monument_name = tile.data[id_lookup["name_id"]]['en']['value']
-                        mon_names.append(monument_name)
-
-                    if str(tile.nodegroup_id) == id_lookup["descriptions_id"]:  # descriptions
-
-                        if tile.data[id_lookup["description_type_id"]] == '35508b82-062a-469f-830a-6040c5e5eb8c':  # summary type
-                            summary = tile.data[id_lookup["description_id"]]['en']['value']
-                            summary = summary.replace("<p>", "")
-                            summary = summary.replace("</p>", "")
-                            mon_summaries.append(summary)
-
-                        if tile.data[id_lookup["description_type_id"]] == '39a21ebf-7dd6-4a7f-a211-9453202f60aa':  # full type
-                            full_description = tile.data[id_lookup["description_id"]]['en']['value']
-                            full_description = full_description.replace("<p>", "")
-                            full_description = full_description.replace("</p>", "")
-                            mon_descriptions.append(full_description)
-
-                    if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9": # monument
-                        if str(tile.nodegroup_id) == id_lookup["record_type_id"]:  # resource model type
-                            model_type = tile.data[id_lookup["record_type_id"]]
-                            model_type_label = "Building" if model_type == "5e5d6f01-fcd9-4ba0-b86d-564456a520b2" else "Monument"
-                            mon_object["RecordType"] = model_type_label
-
+                if not exclude_flag:
+                    
+                    if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9":
+                        id_lookup = monument_node_ids
                     elif str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
-                        mon_object["RecordType"] = "Find Spot"
-
+                        id_lookup = artifact_node_ids
                     elif str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72":
-                        mon_object["RecordType"] = "Monument"
+                        id_lookup = area_node_ids
 
-                    if str(tile.nodegroup_id) == id_lookup["national_grid_refs_id"]:  # grid reference
-                        grid_ref = tile.data[id_lookup["national_grid_ref_id"]]
-                        grid_ref_converted = convert(grid_ref)
-                        if grid_ref_converted:
-                            mon_object["GridRef"] = grid_ref
-                            mon_object["Easting"] = grid_ref_converted[0]
-                            mon_object["Northing"] = grid_ref_converted[1]
+                #### Value assignment
 
-                    #### MonUID2
-                    if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
+                    #### MonUID1
 
-                        admin_area_object = {
-                            'MonUID': primary_id,
-                            'LegacyID': legacy_id,
-                            'AdminAreaType': None,
-                            'AdminAreaName': None
+                    primary_id = None
+                    legacy_id = None
+                
+                    system_refs_tile = Tile.objects.filter(resourceinstance_id = resource.resourceinstanceid, nodegroup_id = id_lookup["system_refs_id"]) 
+
+                    if len(system_refs_tile) == 1:
+
+                        if system_refs_tile[0].data[id_lookup["primary_ref_id"]]:
+                            primary_id = system_refs_tile[0].data[id_lookup["primary_ref_id"]]
+
+                        if system_refs_tile[0].data[id_lookup["legacy_id"]]:
+                            legacy_id = system_refs_tile[0].data[id_lookup["legacy_id"]]['en']['value']
+
+                    if not primary_id:
+                        warnings.warn(f"Warning, resource with id {resource.resourceinstanceid} is missing a primary_id")
+
+                    mon_object = {
+                        'MonUID': primary_id,
+                        'LegacyID': legacy_id,
+                        'ArchesResourceID': resource.resourceinstanceid,
+                        'Name': None,
+                        'RecordType': None,
+                        'Summary': None,
+                        'Description': None,
+                        'GridRef': None,
+                        'Easting': None,
+                        'Northing': None
+                    }
+
+                    mon_names = []
+                    mon_descriptions =[]
+                    mon_summaries = []
+
+                    for tile in resource.tiles: # retrieve id variables
+
+                        if str(tile.nodegroup_id) == id_lookup["names_id"]:  # names
+                            monument_name = tile.data[id_lookup["name_id"]]['en']['value']
+                            mon_names.append(monument_name)
+
+                        if str(tile.nodegroup_id) == id_lookup["descriptions_id"]:  # descriptions
+
+                            if tile.data[id_lookup["description_type_id"]] == '35508b82-062a-469f-830a-6040c5e5eb8c':  # summary type
+                                summary = tile.data[id_lookup["description_id"]]['en']['value']
+                                summary = summary.replace("<p>", "")
+                                summary = summary.replace("</p>", "")
+                                mon_summaries.append(summary)
+
+                            if tile.data[id_lookup["description_type_id"]] == '39a21ebf-7dd6-4a7f-a211-9453202f60aa':  # full type
+                                full_description = tile.data[id_lookup["description_id"]]['en']['value']
+                                full_description = full_description.replace("<p>", "")
+                                full_description = full_description.replace("</p>", "")
+                                mon_descriptions.append(full_description)
+
+                        if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9": # monument
+                            if str(tile.nodegroup_id) == id_lookup["record_type_id"]:  # resource model type
+                                model_type = tile.data[id_lookup["record_type_id"]]
+                                model_type_label = "Building" if model_type == "5e5d6f01-fcd9-4ba0-b86d-564456a520b2" else "Monument"
+                                mon_object["RecordType"] = model_type_label
+
+                        elif str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
+                            mon_object["RecordType"] = "Find Spot"
+
+                        elif str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72":
+                            mon_object["RecordType"] = "Monument"
+
+                        if str(tile.nodegroup_id) == id_lookup["national_grid_refs_id"]:  # grid reference
+                            grid_ref = tile.data[id_lookup["national_grid_ref_id"]]
+                            grid_ref_converted = convert(grid_ref)
+                            if grid_ref_converted:
+                                mon_object["GridRef"] = grid_ref
+                                mon_object["Easting"] = grid_ref_converted[0]
+                                mon_object["Northing"] = grid_ref_converted[1]
+
+                        #### MonUID2
+                        if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
+
+                            admin_area_object = {
+                                'MonUID': primary_id,
+                                'LegacyID': legacy_id,
+                                'AdminAreaType': None,
+                                'AdminAreaName': None
+                                }
+
+                            area_type = tile.data[id_lookup["area_type"]]
+                            area_type_value = Value.objects.get(valueid=area_type) # administrative area type
+
+                            area_name = tile.data[id_lookup["area_name"]] # administrative area name
+                            area_name_value = Value.objects.get(valueid=area_name)
+                            
+                            admin_area_object ["AdminAreaType"] = area_type_value.value
+                            admin_area_object ["AdminAreaName"] = area_name_value.value
+                            
+                            data_object["admin_areas"].append(admin_area_object)
+
+                        #### MonUID3 - construction phases
+
+                        if str(tile.nodegroup_id) == id_lookup["construction_phases"]:  # find construction phase
+
+                            monument_type_object = {
+                                'UID': str(tile.tileid),
+                                'MonUID': primary_id,
+                                'LegacyID': legacy_id,
+                                'RecType': 'Monument Type',
+                                'MonType': None,
+                                'FromDate': None,
+                                'FromConf': None,
+                                'ToDate': None,
+                                'ToConf': None,
+                                'UnknownDate': None,
+                                'TypeConf': None,
+                                'DateQualifier': None
                             }
 
-                        area_type = tile.data[id_lookup["area_type"]]
-                        area_type_value = Value.objects.get(valueid=area_type) # administrative area type
+                            if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
+                                
+                                monument_types = tile.data[id_lookup["monument_types"]] # monument type
+                            
+                                monument_types_values = []
+                                for monument_type in monument_types:
+                                    monument_type_value = Value.objects.get(
+                                        valueid=monument_type)
+                                    monument_types_values.append(
+                                        monument_type_value.value.upper())
+                                    
+                                monument_types_string = "; ".join(monument_types_values)
+                                monument_type_object["MonType"] = monument_types_string
 
-                        area_name = tile.data[id_lookup["area_name"]] # administrative area name
-                        area_name_value = Value.objects.get(valueid=area_name)
-                        
-                        admin_area_object ["AdminAreaType"] = area_type_value.value
-                        admin_area_object ["AdminAreaName"] = area_name_value.value
-                        
-                        data_object["admin_areas"].append(admin_area_object)
+                                type_certainty = tile.data[id_lookup["type_certainty"]] # type confidence
+                                if type_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632":
+                                    monument_type_object["TypeConf"] = "?"
 
-                    #### MonUID3 - construction phases
+                            if str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
+                                monument_type_object["MonType"] = "FINDSPOT"
 
-                    if str(tile.nodegroup_id) == id_lookup["construction_phases"]:  # find construction phase
+                            date_start = tile.data[id_lookup["date_start"]]
+                            if isinstance(date_start, str):
+                                date_start = date_start.replace("y-", "")
+                            monument_type_object["FromDate"] = date_start
 
-                        monument_type_object = {
-                            'UID': str(tile.tileid),
-                            'MonUID': primary_id,
-                            'LegacyID': legacy_id,
-                            'RecType': 'Monument Type',
-                            'MonType': None,
-                            'FromDate': None,
-                            'FromConf': None,
-                            'ToDate': None,
-                            'ToConf': None,
-                            'UnknownDate': None,
-                            'TypeConf': None,
-                            'DateQualifier': None
-                        }
+                            date_end = tile.data[id_lookup["date_end"]]
+                            if isinstance(date_end, str):
+                                date_end = date_end.replace("y-", "")
+                            monument_type_object["ToDate"] = date_end
+
+                            monument_type_object["UnknownDate"] = 0 if date_start and date_end else 1
+
+                            date_certainty = tile.data[id_lookup["date_certainty"]]
+                            date_certainty_value = "?" if date_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632" else ""
+                            monument_type_object["FromConf"] = date_certainty_value
+                            monument_type_object["ToConf"] = date_certainty_value
+
+                            date_qualifier = tile.data[id_lookup["date_qualifier"]]
+                            if date_qualifier: 
+                                date_qualifier_value = Value.objects.get(
+                                    valueid=date_qualifier)
+                                monument_type_object["DateQualifier"] = date_qualifier_value.value
+                            
+                            data_object["mon_types"].append(monument_type_object)
+
+                        ##### MonUID3 - components
 
                         if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
-                            
-                            monument_types = tile.data[id_lookup["monument_types"]] # monument type
-                        
-                            monument_types_values = []
-                            for monument_type in monument_types:
-                                monument_type_value = Value.objects.get(
-                                    valueid=monument_type)
-                                monument_types_values.append(
-                                    monument_type_value.value.upper())
-                                
-                            monument_types_string = "; ".join(monument_types_values)
-                            monument_type_object["MonType"] = monument_types_string
+                            if str(tile.nodegroup_id) == "55d6a53e-049c-11eb-8618-f875a44e0e11":  # find components
 
-                            type_certainty = tile.data[id_lookup["type_certainty"]] # type confidence
-                            if type_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632":
-                                monument_type_object["TypeConf"] = "?"
+                                component_types = tile.data["46cd4b7e-049d-11eb-ba3a-f875a44e0e11"]
+                                component_types_list = []
+                                for component_type in component_types:
+                                    component_value = Value.objects.get(valueid=component_type)
+                                    component_types_list.append(component_value.value.upper())
+                                components_string = "; ".join(component_types_list)
 
-                        if str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
-                            monument_type_object["MonType"] = "FINDSPOT"
+                                construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
 
-                        date_start = tile.data[id_lookup["date_start"]]
-                        if isinstance(date_start, str):
-                            date_start = date_start.replace("y-", "")
-                        monument_type_object["FromDate"] = date_start
+                                # find the associated construction phase already stored on the data object
+                                construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
 
-                        date_end = tile.data[id_lookup["date_end"]]
-                        if isinstance(date_end, str):
-                            date_end = date_end.replace("y-", "")
-                        monument_type_object["ToDate"] = date_end
+                                component_obj = copy.deepcopy(construction_phase_obj)
+                                component_obj["MonType"] = components_string
+                                component_obj["RecType"] = "Component Type"
+                                component_obj["UID"] = str(tile.tileid)
 
-                        monument_type_object["UnknownDate"] = 0 if date_start and date_end else 1
+                                data_object["mon_types"].append(component_obj)
 
-                        date_certainty = tile.data[id_lookup["date_certainty"]]
-                        date_certainty_value = "?" if date_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632" else ""
-                        monument_type_object["FromConf"] = date_certainty_value
-                        monument_type_object["ToConf"] = date_certainty_value
+                    #### Finish MonUID1
+                    if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
+                    if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
+                    if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
 
-                        date_qualifier = tile.data[id_lookup["date_qualifier"]]
-                        if date_qualifier: 
-                            date_qualifier_value = Value.objects.get(
-                                valueid=date_qualifier)
-                            monument_type_object["DateQualifier"] = date_qualifier_value.value
-                        
-                        data_object["mon_types"].append(monument_type_object)
+                    data_object["monument_entries"].append(mon_object)
 
-                    ##### MonUID3 - components
-
-                    if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
-                        if str(tile.nodegroup_id) == "55d6a53e-049c-11eb-8618-f875a44e0e11":  # find components
-
-                            component_types = tile.data["46cd4b7e-049d-11eb-ba3a-f875a44e0e11"]
-                            component_types_list = []
-                            for component_type in component_types:
-                                component_value = Value.objects.get(valueid=component_type)
-                                component_types_list.append(component_value.value.upper())
-                            components_string = "; ".join(component_types_list)
-
-                            construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
-
-                            # find the associated construction phase already stored on the data object
-                            construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
-
-                            component_obj = copy.deepcopy(construction_phase_obj)
-                            component_obj["MonType"] = components_string
-                            component_obj["RecType"] = "Component Type"
-                            component_obj["UID"] = str(tile.tileid)
-
-                            data_object["mon_types"].append(component_obj)
-
-                #### Finish MonUID1
-                if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
-                if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
-                if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
-
-                data_object["monument_entries"].append(mon_object)
+            except Exception as e:
+                print(f"ERROR: whilst processing {resource.resourceinstanceid}: {e}")
 
         xmlxgExportMon = data_object["monument_entries"]
         xmlxgExportMonAdminArea = data_object["admin_areas"]
