@@ -106,6 +106,8 @@ class ChangesView(View):
         #Data
         db_data = get_data(from_date, to_date, per_page, page)
 
+        #TODO: for version 7.6 this should be changed to look at a Not on Web Group rather than relying on user permissions
+
         permissions = UserObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
         no_access_list = [permission['object_pk'] for permission in permissions]
 
