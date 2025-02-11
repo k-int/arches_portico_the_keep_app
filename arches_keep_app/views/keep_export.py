@@ -11,23 +11,13 @@ import copy
 from django.http import HttpResponse
 from datetime import datetime
 import json
-import logging
 
 def process_resource(request):
     if request.method == 'POST':
 
-        logger = logging.getLogger(__name__)
-
         body = json.loads(request.body)
         resource_ids = body["resourceid_list"]
         period_string = body["period_string"]
-
-        log_file_path = os.path.join(os.path.dirname(__file__), '../../keep_errors.log')
-        
-        logging.basicConfig(filename=log_file_path, 
-            encoding='utf-8', 
-            level=logging.DEBUG,
-            format="%(asctime)s - %(levelname)s - %(message)s")
 
         data_object = {
             'monument_entries': [],
@@ -347,7 +337,6 @@ def process_resource(request):
 
             except Exception as e:
                 print(f"ERROR: whilst processing {resource_id}: {e}")
-                logger.error(f"ERROR: whilst processing {resource_id}: {e}")
 
         xmlxgExportMon = data_object["monument_entries"]
         xmlxgExportMonAdminArea = data_object["admin_areas"]
