@@ -4,6 +4,7 @@
 *.djcache
 .vscode/
 node_modules
+keep_errors.log
 
 # Packaging
 *.egg-info/
