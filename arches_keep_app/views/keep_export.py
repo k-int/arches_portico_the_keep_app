@@ -115,14 +115,15 @@ def process_resource(request):
                                 exclude_flag = True
 
                         if str(tile.nodegroup_id) == "055b3e3f-04c7-11eb-8d64-f875a44e0e11": # Associated Monuments, Areas or Artefacts
-                            assoc_monument_ids = [assoc_resource["resourceId"] for assoc_resource in tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]] # Associated Monument, Area or Artefact
-                            for id in assoc_monument_ids:
-                                assoc_resource = Resource.objects.get(
-                                    resourceinstanceid = id)
-                                if str(assoc_resource.graph_id) == "b8032b00-594d-11e9-9cf0-18cf5eb368c4": # aircraft monument
-                                    exclude_flag = True
-                                if str(assoc_resource.graph_id) == "49bac32e-5464-11e9-a6e2-000d3ab1e588": # maritime vessel
-                                    exclude_flag = True
+                            if tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]:
+                                assoc_monument_ids = [assoc_resource["resourceId"] for assoc_resource in tile.data["055b3e44-04c7-11eb-b131-f875a44e0e11"]] # Associated Monument, Area or Artefact
+                                for id in assoc_monument_ids:
+                                    assoc_resource = Resource.objects.get(
+                                        resourceinstanceid = id)
+                                    if str(assoc_resource.graph_id) == "b8032b00-594d-11e9-9cf0-18cf5eb368c4": # aircraft monument
+                                        exclude_flag = True
+                                    if str(assoc_resource.graph_id) == "49bac32e-5464-11e9-a6e2-000d3ab1e588": # maritime vessel
+                                        exclude_flag = True
 
                 if str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72": # area exclusions
                     for tile in resource.tiles:
