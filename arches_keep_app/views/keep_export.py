@@ -343,9 +343,12 @@ def process_resource(request):
                                 data_object["mon_types"].append(component_obj)
 
                     #### Finish MonUID1
-                    if len(mon_names) > 0: mon_object["Name"] = mon_names[0]
-                    if len(mon_summaries) > 0: mon_object["Summary"] = mon_summaries[0]
-                    if len(mon_descriptions) > 0: mon_object["Description"] = mon_descriptions[0]
+                    if len(mon_names) > 0: 
+                        mon_object["Name"] = mon_names[0]
+                    if len(mon_summaries) > 0: 
+                        mon_object["Summary"] = max(mon_summaries, key=len)
+                    if len(mon_descriptions) > 0: 
+                        mon_object["Description"] = max(mon_descriptions, key=len)
 
                     data_object["monument_entries"].append(mon_object)
 
