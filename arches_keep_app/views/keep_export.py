@@ -46,7 +46,9 @@ def process_resource(request):
             'date_end': '77e8f29f-efdc-11eb-a58e-a87eeabdefba',
             'date_certainty': '77e8f298-efdc-11eb-9465-a87eeabdefba',
             'date_qualifier': '77e8f294-efdc-11eb-a9a2-a87eeabdefba',
-            'type_certainty': '77e9065e-efdc-11eb-baa2-a87eeabdefba'
+            'type_certainty': '77e9065e-efdc-11eb-baa2-a87eeabdefba',
+            'geometry_node_id': "87d3872b-f44f-11eb-bd0c-a87eeabdefba",
+            'feature_shape_id': "87d39b39-f44f-11eb-9b17-a87eeabdefba"
         }
 
         artifact_node_ids = {
@@ -67,7 +69,9 @@ def process_resource(request):
             'date_start': '99cfe72e-381d-11e8-882c-dca90488358a',
             'date_end': '99cff7f8-381d-11e8-a059-dca90488358a',
             'date_certainty': '546b1633-3ba4-11eb-a593-f875a44e0e11',
-            'date_qualifier': '1d9500e3-0e04-11eb-af9a-f875a44e0e11'
+            'date_qualifier': '1d9500e3-0e04-11eb-af9a-f875a44e0e11',
+            'geometry_node_id': 'f7cc629f-f447-11eb-b2d3-a87eeabdefba',
+            'feature_shape_id': 'f7cc8c75-f447-11eb-953a-a87eeabdefba'
         }
 
         area_node_ids = {
@@ -90,7 +94,9 @@ def process_resource(request):
             'date_end': '6c2b6c21-4e8a-11eb-95d9-f875a44e0e11',
             'date_certainty': 'f5711ba7-4e8a-11eb-97c3-f875a44e0e11',
             'date_qualifier': '6c2b6c22-4e8a-11eb-82fe-f875a44e0e11',
-            'type_certainty': 'b334dddf-4e87-11eb-830e-f875a44e0e11'
+            'type_certainty': 'b334dddf-4e87-11eb-830e-f875a44e0e11',
+            'geometry_node_id': '64be2fdb-3ee5-11eb-9565-f875a44e0e11',
+            'feature_shape_id': '64be7e02-3ee5-11eb-8ff0-f875a44e0e11'
         }
 
         for resource_id in resource_ids:
@@ -171,6 +177,7 @@ def process_resource(request):
                         'Summary': None,
                         'Description': None,
                         'GridRef': None,
+                        'Topology': None,
                         'Easting': None,
                         'Northing': None
                     }
@@ -218,6 +225,12 @@ def process_resource(request):
                                 mon_object["GridRef"] = grid_ref
                                 mon_object["Easting"] = grid_ref_converted[0]
                                 mon_object["Northing"] = grid_ref_converted[1]
+
+                        if str(tile.nodegroup_id) == id_lookup["geometry_node_id"]:
+                            if tile.data[id_lookup['feature_shape_id']]:
+                                topology = tile.data[id_lookup['feature_shape_id']]
+                                topology_value = Value.objects.get(valueid=topology)
+                                mon_object["Topology"] = topology_value.value
 
                         #### MonUID2
                         if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
