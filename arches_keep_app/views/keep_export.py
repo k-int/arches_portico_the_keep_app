@@ -1,6 +1,7 @@
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import Value
+import arches.app.utils.task_management as task_management
 
 from arches_keep_app.utils.bng_conversion import convert
 
@@ -11,6 +12,7 @@ import copy
 from django.http import HttpResponse
 from datetime import datetime
 import json
+
 
 def process_resource(request):
     if request.method == 'POST':
@@ -24,6 +26,10 @@ def process_resource(request):
             'admin_areas': [],
             'mon_types': [],
         }
+
+        artifact_graph_id = "343cc20c-2c5a-11e8-90fa-0242ac120005"
+        area_graph_id = "979aaf0b-7042-11ea-9674-287fcf6a5e72"
+        monument_graph_id = "076f9381-7b00-11e9-8d6b-80000b44d1d9"
 
         monument_node_ids = {
             'system_refs_id': '325a2f2f-efe4-11eb-9b0c-a87eeabdefba',
@@ -111,10 +117,10 @@ def process_resource(request):
 
                 exclude_flag = False
 
-                if str(resource.graph_id) not in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", "343cc20c-2c5a-11e8-90fa-0242ac120005", "979aaf0b-7042-11ea-9674-287fcf6a5e72"]:
+                if str(resource.graph_id) not in [monument_graph_id, artifact_graph_id, area_graph_id]:
                     exclude_flag = True
 
-                if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9": # monument exclusions
+                if str(resource.graph_id) == monument_graph_id: # monument exclusions
                     for tile in resource.tiles:
                         if str(tile.nodegroup_id) == "6af2a0cb-efc5-11eb-8436-a87eeabdefba": # designation and protection assignment
                             if tile.data["6af2b696-efc5-11eb-b0b5-a87eeabdefba"]: 
@@ -131,7 +137,7 @@ def process_resource(request):
                                     if str(assoc_resource.graph_id) == "49bac32e-5464-11e9-a6e2-000d3ab1e588": # maritime vessel
                                         exclude_flag = True
 
-                if str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72": # area exclusions
+                if str(resource.graph_id) == area_graph_id: # area exclusions
                     for tile in resource.tiles:
                         if str(tile.nodegroup_id) == "a4a81528-efa9-11eb-9abd-a87eeabdefba": # designation and protection assignment
                             exclude_flag = True
@@ -141,11 +147,11 @@ def process_resource(request):
 
                 if not exclude_flag:
                     
-                    if str(resource.graph_id) == "076f9381-7b00-11e9-8d6b-80000b44d1d9":
+                    if str(resource.graph_id) == monument_graph_id:
                         id_lookup = monument_node_ids
-                    elif str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
+                    elif str(resource.graph_id) == artifact_graph_id:
                         id_lookup = artifact_node_ids
-                    elif str(resource.graph_id) == "979aaf0b-7042-11ea-9674-287fcf6a5e72":
+                    elif str(resource.graph_id) == area_graph_id:
                         id_lookup = area_node_ids
 
                 #### Value assignment
