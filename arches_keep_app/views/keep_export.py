@@ -145,6 +145,15 @@ def process_resource(request):
                         if str(tile.nodegroup_id) == "d17a5389-28cd-11eb-9670-f875a44e0e11": # area assignment
                             exclude_flag = True
 
+                
+                if str(resource.graph_id) == artifact_graph_id: # artefact exclusions
+                    for tile in resource.tiles:
+                        if str(tile.nodegroup_id) == artifact_node_ids['system_refs_id']:
+                            legacy_id = tile.data[artifact_node_ids['legacy_id']]
+                            if legacy_id:
+                                if "MES" not in legacy_id['en']['value']: # only artefacts with MES in legacy id
+                                    exclude_flag = True
+
                 if not exclude_flag:
                     
                     if str(resource.graph_id) == monument_graph_id:
