@@ -260,10 +260,12 @@ def process_resource(request):
                             area_type = tile.data[id_lookup["area_type"]]
                             area_type_value = Value.objects.get(valueid=area_type) # administrative area type
 
+                            area_type_value_string = "Civil Parish" if area_type_value.value == "Parish" else area_type_value.value
+
                             area_name = tile.data[id_lookup["area_name"]] # administrative area name
                             area_name_value = Value.objects.get(valueid=area_name)
                             
-                            admin_area_object ["AdminAreaType"] = area_type_value.value
+                            admin_area_object ["AdminAreaType"] = area_type_value_string
                             admin_area_object ["AdminAreaName"] = area_name_value.value
                             
                             data_object["admin_areas"].append(admin_area_object)
