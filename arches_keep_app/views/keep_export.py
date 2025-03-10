@@ -333,8 +333,7 @@ def process_resource(request):
                                     valueid=date_qualifier)
                                 monument_type_object["DateQualifier"] = date_qualifier_value.value
                             
-                            if date_start and date_end:
-                                data_object["mon_types"].append(monument_type_object)
+                            data_object["mon_types"].append(monument_type_object)
 
                         ##### MonUID3 - components
 
@@ -342,7 +341,6 @@ def process_resource(request):
                             if str(tile.nodegroup_id) == "55d6a53e-049c-11eb-8618-f875a44e0e11":  # find components
 
                                 component_types = tile.data["46cd4b7e-049d-11eb-ba3a-f875a44e0e11"]
-
                                 component_types_list = []
                                 for component_type in component_types:
                                     component_value = Value.objects.get(valueid=component_type)
@@ -352,20 +350,14 @@ def process_resource(request):
                                 construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
 
                                 # find the associated construction phase already stored on the data object
-                                construction_phase_obj = None
-                                
-                                if len(data_object["mon_types"]) > 0: # if there is at least one construction phase stored
-                                    for mon_type in data_object["mon_types"]: 
-                                        if mon_type['UID'] == construction_phase_tileid: # and if one matches the id on this tile
-                                            construction_phase_obj = mon_type
+                                construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
 
-                                    if construction_phase_obj: 
-                                        component_obj = copy.deepcopy(construction_phase_obj)
-                                        component_obj["MonType"] = components_string
-                                        component_obj["RecType"] = "Component Type"
-                                        component_obj["UID"] = str(tile.tileid)
+                                component_obj = copy.deepcopy(construction_phase_obj)
+                                component_obj["MonType"] = components_string
+                                component_obj["RecType"] = "Component Type"
+                                component_obj["UID"] = str(tile.tileid)
 
-                                    data_object["mon_types"].append(component_obj)
+                                data_object["mon_types"].append(component_obj)
 
                     #### Finish MonUID1
                     if len(mon_names) > 0: 
