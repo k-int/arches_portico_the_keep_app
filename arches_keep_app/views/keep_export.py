@@ -105,6 +105,8 @@ def process_resource(request):
             'feature_shape_id': '64be7e02-3ee5-11eb-8ff0-f875a44e0e11'
         }
 
+        resources_with_no_pid = []
+
         for resource_id in resource_ids:
 
             try:
@@ -181,7 +183,7 @@ def process_resource(request):
                             legacy_id = system_refs_tile[0].data[id_lookup["legacy_id"]]['en']['value']
 
                     if not primary_id:
-                        warnings.warn(f"Warning, resource with id {resource.resourceinstanceid} is missing a primary_id")
+                        resources_with_no_pid.append(str(resource.resourceinstanceid))
 
                     mon_object = {
                         'MonUID': primary_id,
@@ -371,6 +373,9 @@ def process_resource(request):
 
             except Exception as e:
                 print(f"ERROR: whilst processing {resource_id}: {e}")
+
+        if len(resources_with_no_pid) > 0:
+            warnings.warn(f"Warning, the following resources are missing a primary_id: {resources_with_no_pid}")
 
         xmlxgExportMon = data_object["monument_entries"]
         xmlxgExportMonAdminArea = data_object["admin_areas"]
