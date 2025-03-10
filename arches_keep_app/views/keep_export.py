@@ -43,16 +43,16 @@ def process_resource(request):
             'record_type_id': '6ed65604-03d0-11ef-89f3-3736dd7ed53f',
             'national_grid_refs_id': '87d39b2b-f44f-11eb-af5e-a87eeabdefba',
             'national_grid_ref_id': '87d3d7bd-f44f-11eb-b1e4-a87eeabdefba',
-            'admin_areas': '87d38725-f44f-11eb-8d4b-a87eeabdefba',
-            'area_type': '87d3d7c5-f44f-11eb-8459-a87eeabdefba',
-            'area_name': '87d3c3ea-f44f-11eb-b532-a87eeabdefba',
-            'construction_phases': '77e8f287-efdc-11eb-a790-a87eeabdefba',
-            'monument_types': '77e90834-efdc-11eb-b2b9-a87eeabdefba',
-            'date_start': '77e8f28e-efdc-11eb-b9f5-a87eeabdefba',
-            'date_end': '77e8f29f-efdc-11eb-a58e-a87eeabdefba',
-            'date_certainty': '77e8f298-efdc-11eb-9465-a87eeabdefba',
-            'date_qualifier': '77e8f294-efdc-11eb-a9a2-a87eeabdefba',
-            'type_certainty': '77e9065e-efdc-11eb-baa2-a87eeabdefba',
+            'admin_areas_id': '87d38725-f44f-11eb-8d4b-a87eeabdefba',
+            'area_type_id': '87d3d7c5-f44f-11eb-8459-a87eeabdefba',
+            'area_name_id': '87d3c3ea-f44f-11eb-b532-a87eeabdefba',
+            'construction_phases_id': '77e8f287-efdc-11eb-a790-a87eeabdefba',
+            'monument_types_id': '77e90834-efdc-11eb-b2b9-a87eeabdefba',
+            'date_start_id': '77e8f28e-efdc-11eb-b9f5-a87eeabdefba',
+            'date_end_id': '77e8f29f-efdc-11eb-a58e-a87eeabdefba',
+            'date_certainty_id': '77e8f298-efdc-11eb-9465-a87eeabdefba',
+            'date_qualifier_id': '77e8f294-efdc-11eb-a9a2-a87eeabdefba',
+            'type_certainty_id': '77e9065e-efdc-11eb-baa2-a87eeabdefba',
             'geometry_node_id': "87d3872b-f44f-11eb-bd0c-a87eeabdefba",
             'feature_shape_id': "87d39b39-f44f-11eb-9b17-a87eeabdefba"
         }
@@ -68,14 +68,14 @@ def process_resource(request):
             'description_id': 'c30977b0-991e-11ea-ba04-f875a44e0e11',
             'national_grid_refs_id': 'f7cc62ae-f447-11eb-87da-a87eeabdefba',
             'national_grid_ref_id': 'f7ccc89a-f447-11eb-93ce-a87eeabdefba',
-            'admin_areas': 'f7cc6299-f447-11eb-b8a3-a87eeabdefba',
-            'area_type': 'f7ccc8a2-f447-11eb-9310-a87eeabdefba',
-            'area_name': 'f7cca081-f447-11eb-ac78-a87eeabdefba',
-            'construction_phases': '99cfca45-381d-11e8-968a-dca90488358a',
-            'date_start': '99cfe72e-381d-11e8-882c-dca90488358a',
-            'date_end': '99cff7f8-381d-11e8-a059-dca90488358a',
-            'date_certainty': '546b1633-3ba4-11eb-a593-f875a44e0e11',
-            'date_qualifier': '1d9500e3-0e04-11eb-af9a-f875a44e0e11',
+            'admin_areas_id': 'f7cc6299-f447-11eb-b8a3-a87eeabdefba',
+            'area_type_id': 'f7ccc8a2-f447-11eb-9310-a87eeabdefba',
+            'area_name_id': 'f7cca081-f447-11eb-ac78-a87eeabdefba',
+            'construction_phases_id': '99cfca45-381d-11e8-968a-dca90488358a',
+            'date_start_id': '99cfe72e-381d-11e8-882c-dca90488358a',
+            'date_end_id': '99cff7f8-381d-11e8-a059-dca90488358a',
+            'date_certainty_id': '546b1633-3ba4-11eb-a593-f875a44e0e11',
+            'date_qualifier_id': '1d9500e3-0e04-11eb-af9a-f875a44e0e11',
             'geometry_node_id': 'f7cc629f-f447-11eb-b2d3-a87eeabdefba',
             'feature_shape_id': 'f7cc8c75-f447-11eb-953a-a87eeabdefba'
         }
@@ -91,16 +91,16 @@ def process_resource(request):
             'description_id': 'f3cc1684-185b-11eb-9a07-f875a44e0e11',
             'national_grid_refs_id': 'd17a5386-28cd-11eb-972b-f875a44e0e11',
             'national_grid_ref_id': 'd17a7abb-28cd-11eb-81f8-f875a44e0e11',
-            'admin_areas': 'd17a538c-28cd-11eb-bb61-f875a44e0e11',
-            'area_type': 'd17a7aca-28cd-11eb-bf31-f875a44e0e11',
-            'area_name': 'd17a7ab2-28cd-11eb-8ab9-f875a44e0e11',
-            'construction_phases': 'b334dddc-4e87-11eb-ab6c-f875a44e0e11',
-            'monument_types': 'b334dde6-4e87-11eb-a67c-f875a44e0e11',
-            'date_start': '6c2b6c20-4e8a-11eb-bd7f-f875a44e0e11',
-            'date_end': '6c2b6c21-4e8a-11eb-95d9-f875a44e0e11',
-            'date_certainty': 'f5711ba7-4e8a-11eb-97c3-f875a44e0e11',
-            'date_qualifier': '6c2b6c22-4e8a-11eb-82fe-f875a44e0e11',
-            'type_certainty': 'b334dddf-4e87-11eb-830e-f875a44e0e11',
+            'admin_areas_id': 'd17a538c-28cd-11eb-bb61-f875a44e0e11',
+            'area_type_id': 'd17a7aca-28cd-11eb-bf31-f875a44e0e11',
+            'area_name_id': 'd17a7ab2-28cd-11eb-8ab9-f875a44e0e11',
+            'construction_phases_id': 'b334dddc-4e87-11eb-ab6c-f875a44e0e11',
+            'monument_types_id': 'b334dde6-4e87-11eb-a67c-f875a44e0e11',
+            'date_start_id': '6c2b6c20-4e8a-11eb-bd7f-f875a44e0e11',
+            'date_end_id': '6c2b6c21-4e8a-11eb-95d9-f875a44e0e11',
+            'date_certainty_id': 'f5711ba7-4e8a-11eb-97c3-f875a44e0e11',
+            'date_qualifier_id': '6c2b6c22-4e8a-11eb-82fe-f875a44e0e11',
+            'type_certainty_id': 'b334dddf-4e87-11eb-830e-f875a44e0e11',
             'geometry_node_id': '64be2fdb-3ee5-11eb-9565-f875a44e0e11',
             'feature_shape_id': '64be7e02-3ee5-11eb-8ff0-f875a44e0e11'
         }
@@ -248,7 +248,7 @@ def process_resource(request):
                                 mon_object["Topology"] = topology_value.value
 
                         #### MonUID2
-                        if str(tile.nodegroup_id) == id_lookup["admin_areas"]:  
+                        if str(tile.nodegroup_id) == id_lookup["admin_areas_id"]:  
 
                             admin_area_object = {
                                 'MonUID': primary_id,
@@ -257,12 +257,12 @@ def process_resource(request):
                                 'AdminAreaName': None
                                 }
 
-                            area_type = tile.data[id_lookup["area_type"]]
+                            area_type = tile.data[id_lookup["area_type_id"]]
                             area_type_value = Value.objects.get(valueid=area_type) # administrative area type
 
                             area_type_value_string = "Civil Parish" if area_type_value.value == "Parish" else area_type_value.value
 
-                            area_name = tile.data[id_lookup["area_name"]] # administrative area name
+                            area_name = tile.data[id_lookup["area_name_id"]] # administrative area name
                             area_name_value = Value.objects.get(valueid=area_name)
                             
                             admin_area_object ["AdminAreaType"] = area_type_value_string
@@ -272,7 +272,7 @@ def process_resource(request):
 
                         #### MonUID3 - construction phases
 
-                        if str(tile.nodegroup_id) == id_lookup["construction_phases"]:  # find construction phase
+                        if str(tile.nodegroup_id) == id_lookup["construction_phases_id"]:  # find construction phase
 
                             monument_type_object = {
                                 'UID': str(tile.tileid),
@@ -291,7 +291,7 @@ def process_resource(request):
 
                             if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
                                 
-                                monument_types = tile.data[id_lookup["monument_types"]] # monument type
+                                monument_types = tile.data[id_lookup["monument_types_id"]] # monument type
                             
                                 monument_types_values = []
                                 for monument_type in monument_types:
@@ -303,31 +303,31 @@ def process_resource(request):
                                 monument_types_string = "; ".join(monument_types_values)
                                 monument_type_object["MonType"] = monument_types_string
 
-                                type_certainty = tile.data[id_lookup["type_certainty"]] # type confidence
+                                type_certainty = tile.data[id_lookup["type_certainty_id"]] # type confidence
                                 if type_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632":
                                     monument_type_object["TypeConf"] = "?"
 
                             if str(resource.graph_id) == "343cc20c-2c5a-11e8-90fa-0242ac120005":
                                 monument_type_object["MonType"] = "FINDSPOT"
 
-                            date_start = tile.data[id_lookup["date_start"]]
+                            date_start = tile.data[id_lookup["date_start_id"]]
                             if isinstance(date_start, str):
                                 date_start = date_start.replace("y-", "")
                             monument_type_object["FromDate"] = date_start
 
-                            date_end = tile.data[id_lookup["date_end"]]
+                            date_end = tile.data[id_lookup["date_end_id"]]
                             if isinstance(date_end, str):
                                 date_end = date_end.replace("y-", "")
                             monument_type_object["ToDate"] = date_end
 
                             monument_type_object["UnknownDate"] = 0 if date_start and date_end else 1
 
-                            date_certainty = tile.data[id_lookup["date_certainty"]]
+                            date_certainty = tile.data[id_lookup["date_certainty_id"]]
                             date_certainty_value = "?" if date_certainty == "2d32062f-80b4-4293-94aa-46653ba5c632" else ""
                             monument_type_object["FromConf"] = date_certainty_value
                             monument_type_object["ToConf"] = date_certainty_value
 
-                            date_qualifier = tile.data[id_lookup["date_qualifier"]]
+                            date_qualifier = tile.data[id_lookup["date_qualifier_id"]]
                             if date_qualifier: 
                                 date_qualifier_value = Value.objects.get(
                                     valueid=date_qualifier)
