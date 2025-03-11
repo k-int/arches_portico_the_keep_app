@@ -121,7 +121,7 @@ def process_resource(request):
 
                 if str(resource.graph_id) not in [monument_graph_id, artifact_graph_id, area_graph_id]:
                     exclude_flag = True
-
+                
                 if str(resource.graph_id) == monument_graph_id: # monument exclusions
                     for tile in resource.tiles:
                         if str(tile.nodegroup_id) == "6af2a0cb-efc5-11eb-8436-a87eeabdefba": # designation and protection assignment
@@ -352,9 +352,16 @@ def process_resource(request):
                                 construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
 
                                 # find the associated construction phase already stored on the data object
-                                construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
+                                if construction_phase_tileid:
+                                    construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
+                                    component_obj = copy.deepcopy(construction_phase_obj)
 
-                                component_obj = copy.deepcopy(construction_phase_obj)
+                                else:
+                                    component_obj = {
+                                        'MonUID': primary_id,
+                                        'LegacyID': legacy_id,
+                                    }                                
+
                                 component_obj["MonType"] = components_string
                                 component_obj["RecType"] = "Component Type"
                                 component_obj["UID"] = str(tile.tileid)
