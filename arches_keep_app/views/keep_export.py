@@ -342,6 +342,16 @@ def process_resource(request):
                         if str(resource.graph_id) in ["076f9381-7b00-11e9-8d6b-80000b44d1d9", '979aaf0b-7042-11ea-9674-287fcf6a5e72']: # monument or area
                             if str(tile.nodegroup_id) == "55d6a53e-049c-11eb-8618-f875a44e0e11":  # find components
 
+                                component_obj = {
+                                    'UID': str(tile.tileid),
+                                    'MonUID': primary_id,
+                                    'LegacyID': legacy_id,
+                                    'RecType': "Component Type",
+                                    'MonType': None,
+                                    'FromDate': None,
+                                    'ToDate': None,
+                                }
+
                                 component_types = tile.data["46cd4b7e-049d-11eb-ba3a-f875a44e0e11"]
                                 component_types_list = []
                                 for component_type in component_types:
@@ -349,22 +359,23 @@ def process_resource(request):
                                     component_types_list.append(component_value.value.upper())
                                 components_string = "; ".join(component_types_list)
 
+                                component_obj["MonType"] = components_string
+
                                 construction_phase_tileid = tile.data["a0c7f934-04a4-11eb-9d78-f875a44e0e11"]
 
                                 # find the associated construction phase already stored on the data object
                                 if construction_phase_tileid:
-                                    construction_phase_obj = [construction_phase for construction_phase in data_object["mon_types"] if construction_phase["UID"] == construction_phase_tileid][0]
-                                    component_obj = copy.deepcopy(construction_phase_obj)
+                                    mon_type_tile = Tile.objects.get(pk=construction_phase_tileid)
+                            
+                                    date_start = mon_type_tile.data[id_lookup["date_start_id"]]
+                                    if isinstance(date_start, str):
+                                        date_start = date_start.replace("y-", "")
+                                    component_obj["FromDate"] = date_start
 
-                                else:
-                                    component_obj = {
-                                        'MonUID': primary_id,
-                                        'LegacyID': legacy_id,
-                                    }                                
-
-                                component_obj["MonType"] = components_string
-                                component_obj["RecType"] = "Component Type"
-                                component_obj["UID"] = str(tile.tileid)
+                                    date_end = mon_type_tile.data[id_lookup["date_end_id"]]
+                                    if isinstance(date_end, str):
+                                        date_end = date_end.replace("y-", "")
+                                    component_obj["ToDate"] = date_end
 
                                 data_object["mon_types"].append(component_obj)
 
