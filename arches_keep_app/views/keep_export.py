@@ -37,6 +37,7 @@ def process_resource(request):
             'legacy_id': '325a441c-efe4-11eb-9283-a87eeabdefba',
             'names_id': '676d47f9-9c1c-11ea-9aa0-f875a44e0e11',
             'name_id': '676d47ff-9c1c-11ea-b07f-f875a44e0e11',
+            "name_type_id": "676d47fc-9c1c-11ea-b5b0-f875a44e0e11",
             'descriptions_id': 'ba342e69-b554-11ea-a027-f875a44e0e11',
             'description_type_id': 'ba34557b-b554-11ea-ab95-f875a44e0e11',
             'description_id': 'ba345577-b554-11ea-a9ee-f875a44e0e11',
@@ -63,6 +64,7 @@ def process_resource(request):
             'legacy_id': 'dd8032b1-b494-11ea-a183-f875a44e0e11',
             'names_id': '5b0dfb23-7fe2-11ea-bf70-f875a44e0e11',
             'name_id': '5b0dfb27-7fe2-11ea-8ac9-f875a44e0e11',
+            'name_type_id': "1e45d88a-7fe4-11ea-b374-f875a44e0e11",
             'descriptions_id': 'c30977ad-991e-11ea-9368-f875a44e0e11',
             'description_type_id': 'c30977b1-991e-11ea-b259-f875a44e0e11',
             'description_id': 'c30977b0-991e-11ea-ba04-f875a44e0e11',
@@ -86,6 +88,7 @@ def process_resource(request):
             'legacy_id': '8dca12bd-edeb-11eb-a6c6-a87eeabdefba',
             'names_id': 'f45dbbe3-80b7-11ea-ae0e-f875a44e0e11',
             'name_id': 'f45dbbe8-80b7-11ea-b325-f875a44e0e11',
+            "name_type_id": "f45dbbe6-80b7-11ea-9d8a-f875a44e0e11",
             'descriptions_id': 'f3cc1681-185b-11eb-927e-f875a44e0e11',
             'description_type_id': 'f3cc1685-185b-11eb-821c-f875a44e0e11',
             'description_id': 'f3cc1684-185b-11eb-9a07-f875a44e0e11',
@@ -207,7 +210,9 @@ def process_resource(request):
 
                         if str(tile.nodegroup_id) == id_lookup["names_id"]:  # names
                             monument_name = tile.data[id_lookup["name_id"]]['en']['value']
-                            mon_names.append(monument_name)
+                            monument_name_type = tile.data[id_lookup["name_type_id"]]
+                            mon_name_obj = {"mon_name": monument_name, "mon_name_type": monument_name_type}
+                            mon_names.append(mon_name_obj)
 
                         if str(tile.nodegroup_id) == id_lookup["descriptions_id"]:  # descriptions
 
@@ -381,7 +386,19 @@ def process_resource(request):
 
                     #### Finish MonUID1
                     if len(mon_names) > 0: 
-                        mon_object["Name"] = mon_names[0]
+
+                        if str(resource.graph_id) == artifact_graph_id: # for artefacts, separate primary and alternative names, and take first alternative if exists
+                            primary_names = [name for name in mon_names if name["mon_name_type"] == '2df285fa-9cf2-45e7-bc05-a67b7d7ddc2f']
+                            alternative_names = [name for name in mon_names if name["mon_name_type"] == 'e9170ee3-3455-4ec3-b596-475c0969f3bf']
+
+                            if alternative_names:
+                                mon_object["Name"] = alternative_names[0]["mon_name"]
+                            else: 
+                                mon_object["Name"] = primary_names[0]["mon_name"]
+                    
+                        else: 
+                            mon_object["Name"] = mon_names[0]["mon_name"]
+
                     if len(mon_summaries) > 0: 
                         mon_object["Summary"] = max(mon_summaries, key=len)
                     if len(mon_descriptions) > 0: 
