@@ -6,9 +6,8 @@ import arches.app.utils.task_management as task_management
 from arches_keep_app.utils.bng_conversion import convert
 
 import warnings
-import os
 import xmltodict
-import copy
+import re
 from django.http import HttpResponse
 from datetime import datetime
 import json
@@ -109,6 +108,7 @@ def process_resource(request):
         }
 
         resources_with_no_pid = []
+        included_findspots = []
 
         for resource_id in resource_ids:
 
@@ -155,9 +155,16 @@ def process_resource(request):
                     for tile in resource.tiles:
                         if str(tile.nodegroup_id) == artifact_node_ids['system_refs_id']:
                             legacy_id = tile.data[artifact_node_ids['legacy_id']]
-                            if legacy_id:
-                                if "MES" not in legacy_id['en']['value']: # only artefacts with MES in legacy id
-                                    exclude_flag = True
+
+                            legacy_MES_id_match = re.search(r'\bMES\d+\b', legacy_id['en']['value'])
+                            legacy_MES_id = legacy_MES_id_match.group() if legacy_MES_id_match else None
+
+                            if not legacy_MES_id: # only artefacts with MES in legacy id
+                                exclude_flag = True
+                            elif legacy_MES_id in included_findspots: # only included once
+                                exclude_flag = True
+                            else:
+                                included_findspots.append(legacy_MES_id)
 
                 if not exclude_flag:
                     
@@ -401,8 +408,12 @@ def process_resource(request):
 
                     if len(mon_summaries) > 0: 
                         mon_object["Summary"] = max(mon_summaries, key=len)
+                    
                     if len(mon_descriptions) > 0: 
-                        mon_object["Description"] = max(mon_descriptions, key=len)
+                        if str(resource.graph_id) == artifact_graph_id: # for artefacts, choose last full description
+                            mon_object["Description"] = mon_descriptions[-1]
+                        else: 
+                            mon_object["Description"] = max(mon_descriptions, key=len) # otherwise choose longest description
 
                     data_object["monument_entries"].append(mon_object)
 
