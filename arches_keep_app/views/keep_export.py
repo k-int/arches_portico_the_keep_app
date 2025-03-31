@@ -156,15 +156,17 @@ def process_resource(request):
                         if str(tile.nodegroup_id) == artifact_node_ids['system_refs_id']:
                             legacy_id = tile.data[artifact_node_ids['legacy_id']]
 
-                            legacy_MES_id_match = re.search(r'\bMES\d+\b', legacy_id['en']['value'])
-                            legacy_MES_id = legacy_MES_id_match.group() if legacy_MES_id_match else None
+                            if legacy_id:
 
-                            if not legacy_MES_id: # only artefacts with MES in legacy id
-                                exclude_flag = True
-                            elif legacy_MES_id in included_findspots: # only included once
-                                exclude_flag = True
-                            else:
-                                included_findspots.append(legacy_MES_id)
+                                legacy_MES_id_match = re.search(r'\bMES\d+\b', legacy_id['en']['value'])
+                                legacy_MES_id = legacy_MES_id_match.group() if legacy_MES_id_match else None
+
+                                if not legacy_MES_id: # only artefacts with MES in legacy id
+                                    exclude_flag = True
+                                elif legacy_MES_id in included_findspots: # only included once
+                                    exclude_flag = True
+                                else:
+                                    included_findspots.append(legacy_MES_id)
 
                 if not exclude_flag:
                     
@@ -326,12 +328,12 @@ def process_resource(request):
 
                             date_start = tile.data[id_lookup["date_start_id"]]
                             if isinstance(date_start, str):
-                                date_start = date_start.replace("y-", "")
+                                date_start = date_start.replace("y-", "-")
                             monument_type_object["FromDate"] = date_start
 
                             date_end = tile.data[id_lookup["date_end_id"]]
                             if isinstance(date_end, str):
-                                date_end = date_end.replace("y-", "")
+                                date_end = date_end.replace("y-", "-")
                             monument_type_object["ToDate"] = date_end
 
                             monument_type_object["UnknownDate"] = 0 if date_start and date_end else 1
@@ -381,12 +383,12 @@ def process_resource(request):
                             
                                     date_start = mon_type_tile.data[id_lookup["date_start_id"]]
                                     if isinstance(date_start, str):
-                                        date_start = date_start.replace("y-", "")
+                                        date_start = date_start.replace("y-", "-")
                                     component_obj["FromDate"] = date_start
 
                                     date_end = mon_type_tile.data[id_lookup["date_end_id"]]
                                     if isinstance(date_end, str):
-                                        date_end = date_end.replace("y-", "")
+                                        date_end = date_end.replace("y-", "-")
                                     component_obj["ToDate"] = date_end
 
                                 data_object["mon_types"].append(component_obj)
